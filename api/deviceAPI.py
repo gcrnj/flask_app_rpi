@@ -34,7 +34,7 @@ def register_device():
         return jsonify({"error": str(e)}), 500
 
 # GET - DEVICES
-@deviceAPI.route('/<device_id>', methods=['GET'])
+@deviceAPI.route('/find/<device_id>', methods=['GET'])
 def get_device(device_id):
     try:
         device_doc = devices_ref.document(device_id).get()
