@@ -8,7 +8,7 @@ default_app = initialize_app(cred)
 def create_app():
     app = Flask(__name__)
 
-    from .userAPI import deviceAPI  
+    from .deviceAPI import deviceAPI  
 
     app.register_blueprint(deviceAPI, url_prefix='/devices')
     return app
