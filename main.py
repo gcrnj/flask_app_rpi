@@ -9,7 +9,6 @@ def run_async():
     async_py.run()
 
 if __name__ == '__main__':
-    app.run(port=5000, debug = True)
     print("Running async_py.py")
     threading.Thread(target=run_async, daemon=True).start()
 
