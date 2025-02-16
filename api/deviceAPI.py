@@ -27,7 +27,8 @@ def register_device():
         # Reference to the Firestore document
         new_device_ref = devices_ref.add({
             "createdAt": firestore.SERVER_TIMESTAMP,
-            "ownerId": ""
+            "ownerId": "",
+            "deviceName": "Main System"
             })
 
         return jsonify({"message": "Device registered successfully", "device_id": new_device_ref[1].id}), 201
