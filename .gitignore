@@ -4,3 +4,4 @@
 __pycache__/
 *.pyc
 *.pyo
+api/__pycache__/__init__.cpython-311.pyc

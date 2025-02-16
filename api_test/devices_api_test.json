@@ -1,0 +1,59 @@
+{
+    "info": {
+      "name": "Device API Tests",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Get All Devices",
+        "request": {
+          "method": "GET",
+          "url": "http://localhost:5000/"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 200\", function () {",
+                "    pm.response.to.have.status(200);",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Get Specific Device",
+        "request": {
+          "method": "GET",
+          "url": {
+            "raw": "http://localhost:5000/find/{{device_id}}",
+            "host": ["http://localhost:5000"],
+            "path": ["find", "{{device_id}}"],
+            "variable": [
+              {
+                "key": "device_id",
+                "value": "your_device_id_here"
+              }
+            ]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 200 or 404\", function () {",
+                "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  
