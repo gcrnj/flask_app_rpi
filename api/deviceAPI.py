@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from firebase_admin import firestore
 from sensors import soil_moisture
+from sensors import temp_humid
 from datetime import datetime
 
 db = firestore.client()
@@ -66,7 +67,7 @@ def get_soil_moisture(device_id):
 
 from flask import request
 
-# CREATE - SOIL MOISTURE
+# CREATE - SOIL MOISTURE and TEMPERATURE
 @deviceAPI.route('/<device_id>/soil_moisture', methods=['POST'])
 def add_temperature(device_id):
     try:
@@ -86,6 +87,7 @@ def add_temperature(device_id):
             return jsonify({"error": "Missing required field: Time"}), 400
         
         moisture = soil_moisture.get_from_pot(pot)
+        temperature, humidity = temp_humid.get_temp_humid()
 
         # Reference to the moisture_readings subcollection
         readings_ref = devices_ref.document(device_id).collection("moisture_readings")
@@ -96,9 +98,11 @@ def add_temperature(device_id):
         new_doc_ref = readings_ref.add({
             "pot": pot,
             "moisture": moisture,
+            "temperature": temperature,
+            "humidiity": humidity,
             "time": date_time,
         })
 
-        return jsonify({"message": "Temperature added successfully", "id": new_doc_ref[1].id}), 201
+        return jsonify({"message": f"Soil Moisture ({moisture}), Temperature({temperature}) and Humidity ({humidity}) added successfully", "id": new_doc_ref[1].id}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
