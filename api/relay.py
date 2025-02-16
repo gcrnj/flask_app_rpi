@@ -1,15 +1,16 @@
 import RPi.GPIO as GPIO
 import time
-
+from cpio import Cpio
 # Set the GPIO mode
 GPIO.setmode(GPIO.BCM)
 
 # Relay pin numbers (replace these with the actual GPIO pins you are using)
-relay_pins = [26]  # GPIO pin for the relay (example)
+relay_pins = [Cpio.Growlight.value, Cpio.Pump.value]  # GPIO pin for the relay (example)
 
 # Set the relay pins as outputs
 for pin in relay_pins:
     GPIO.setup(pin, GPIO.OUT)
+    print(pin)
 
 # Function to turn on all relays
 def turn_on_all_relays():
@@ -29,7 +30,7 @@ try:
     
     print("Turning off all relays")
     turn_off_all_relays()
-    time.sleep(20)  # Keep relays off for 2 seconds
+    time.sleep(5)  # Keep relays off for 2 seconds
 except Exception as error:
     print(error)
 finally:

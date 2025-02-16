@@ -1,5 +1,5 @@
 from api import create_app
-import async_py
+import sensors.async_py as async_py
 import threading
 
 app = create_app()

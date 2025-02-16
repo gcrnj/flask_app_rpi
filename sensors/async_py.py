@@ -1,5 +1,5 @@
 import asyncio
-from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temperature as temperature_py, growlight as growlight_py
+import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
 import time
 
 validMaxTemperature = 28
@@ -14,16 +14,20 @@ async def run_sensors():
     while True:
         #============= DHT11 & Growlight
         print("/////Checking DHT11 & Growlight")
-        temperature = temperature_py.get_temperature()
-
-        if temperature < 28 and growlight_py.get_growlight_status() == 0:
+        temperature, humidity = temperature_py.get_temp_humid()
+        growlight_status =  growlight_py.get_growlight_status()
+        if temperature == None:
+            print("Error temperature")
+        elif temperature < 28:
             # Turn on growlight
             print(f'Temperature {temperature} is too low. Turning on growlight.')
-        elif temperature > 33 and growlight_py.get_growlight_status() == 1:
+            growlight_py.turn_on_growlight()
+        elif temperature > 27:
             # Turn off growlight
             print(f'Temperature {temperature} is too high. Turning off growlight.')
+            growlight_py.turn_off_growlight()
         else:
-            print(f'Temperature {temperature} is just right')
+            print(f'Temperature {temperature} is just right. Growlight: {growlight_status}')
 
         #============= Soil Moisture, Pump & Solenoid Valve
         print("/////Checking Soil Moisture, Pump & Solenoid Valve")
@@ -80,5 +84,5 @@ async def run_sensors():
 
 
 
-def run():
-    asyncio.run(run_sensors())
+asyncio.run(run_sensors())
+
