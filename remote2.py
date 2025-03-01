@@ -15,4 +15,4 @@ try:
 except KeyboardInterrupt:
     print("Process interrupted")
 finally:
-    GPIO.cleanup()
+    pass  
