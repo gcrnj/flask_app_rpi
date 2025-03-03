@@ -1,7 +1,9 @@
 import cpio
 import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)  # Use BCM numbering
 PUMP_PIN = cpio.Cpio.Pump.value
+GPIO.setup(PUMP_PIN, GPIO.OUT)  # Set grow light pin as output because you are sending signals to it
 
 def get_pump_status() -> bool:
     return True
