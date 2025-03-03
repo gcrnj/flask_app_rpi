@@ -22,11 +22,11 @@ def get_from_pot(pot_number: int):
         # channel3 = AnalogIn(ads, ADS.P3)
         match pot_number:
             case 1:
-                return AnalogIn(ads, ADS.P1).value
+                return AnalogIn(ads, ADS.P1).voltage
             case 2:
-                return AnalogIn(ads, ADS.P2).value
+                return AnalogIn(ads, ADS.P2).voltage
             case 3:
-                return AnalogIn(ads, ADS.P3).value
+                return AnalogIn(ads, ADS.P3).voltage
     except Exception as e:
         return None
 ###
