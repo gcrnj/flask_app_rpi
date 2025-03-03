@@ -45,40 +45,39 @@ async def run_sensors():
         ### Dry Soil: 3.4V – 5.0V
         ### Moist Soil: 1.5V – 3.5V
         ### Wet Soil: 0.0V – 1.4V
-        if pumpStatus == 1:
-            # pump is off
-            shouldTurnPumpOn = False
+        # pump is off
+        shouldTurnPumpOn = False
 
-            # Soil Moisture 1 and  Valve 1
-            if moisture1 >= 3.4:
-                valve_py.turn_valve_on(1)
-                shouldTurnPumpOn = True
-            else:
-                valve_py.turn_valve_off(1)
+        # Soil Moisture 1 and  Valve 1
+        if moisture1 >= 3.4:
+            valve_py.turn_valve_on(1)
+            shouldTurnPumpOn = True
+        else:
+            valve_py.turn_valve_off(1)
 
-            # Valve 2
-            if moisture2 >= 3.4:
-                valve_py.turn_valve_on(2)
-                shouldTurnPumpOn = True
-            else:
-                valve_py.turn_valve_off(2)
+        # Valve 2
+        if moisture2 >= 3.4:
+            valve_py.turn_valve_on(2)
+            shouldTurnPumpOn = True
+        else:
+            valve_py.turn_valve_off(2)
 
-            # Valve 3
-            if moisture3 >= 3.4:
-                valve_py.turn_valve_on(3)
-                shouldTurnPumpOn = True
-            else:
-                valve_py.turn_valve_off(3)
-            
-            time
+        # Valve 3
+        if moisture3 >= 3.4:
+            valve_py.turn_valve_on(3)
+            shouldTurnPumpOn = True
+        else:
+            valve_py.turn_valve_off(3)
+        
+        time
 
-            # Turn or off Pump
-            if shouldTurnPumpOn:
-                pump_py.turn_on()
-                print("Pump is On")
-            else:
-                pump_py.turn_off()
-                print("Pump is Off")
+        # Turn or off Pump
+        if shouldTurnPumpOn:
+            pump_py.turn_on()
+            print("Pump is On")
+        else:
+            pump_py.turn_off()
+            print("Pump is Off")
 
         # Delay
         time.sleep(2)
