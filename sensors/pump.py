@@ -1,7 +1,7 @@
 import cpio
 import RPi.GPIO as GPIO
 
-PUMP_PIN = cpio.Cpio.Pump
+PUMP_PIN = cpio.Cpio.Pump.value
 
 def get_pump_status() -> bool:
     return True
