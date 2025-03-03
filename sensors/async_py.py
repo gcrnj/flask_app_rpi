@@ -38,27 +38,33 @@ async def run_sensors():
         valve1 = valve_py.get_valve_status(1)
         valve2 = valve_py.get_valve_status(2)
         valve3 = valve_py.get_valve_status(3)
+        print(f"Moisture1 = {moisture1}")
+        print(f"Moisture2 = {moisture2}")
+        print(f"Moisture3 = {moisture3}")
         
+        ### Dry Soil: 3.4V – 5.0V
+        ### Moist Soil: 1.5V – 3.5V
+        ### Wet Soil: 0.0V – 1.4V
         if pumpStatus == 1:
             # pump is off
             shouldTurnPumpOn = False
 
             # Soil Moisture 1 and  Valve 1
-            if moisture1:
+            if moisture1 >= 3.4:
                 valve_py.turn_valve_on(1)
                 shouldTurnPumpOn = True
             else:
                 valve_py.turn_valve_off(1)
 
             # Valve 2
-            if moisture2:
+            if moisture2 >= 3.4:
                 valve_py.turn_valve_on(2)
                 shouldTurnPumpOn = True
             else:
                 valve_py.turn_valve_off(2)
 
             # Valve 3
-            if moisture3:
+            if moisture3 >= 3.4:
                 valve_py.turn_valve_on(3)
                 shouldTurnPumpOn = True
             else:
