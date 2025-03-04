@@ -15,7 +15,7 @@ async def run_sensors():
         #============= DHT11 & Growlight
         print("/////Checking DHT11 & Growlight")
         temperature, humidity = temperature_py.get_temp_humid()
-        growlight_status =  growlight_py.get_growlight_status()
+        # growlight_status =  growlight_py.get_growlight_status()
         if temperature == None:
             print("Error temperature")
         elif temperature < 28:
@@ -27,7 +27,7 @@ async def run_sensors():
             print(f'Temperature {temperature} is too high. Turning off growlight.')
             growlight_py.turn_off_growlight()
         else:
-            print(f'Temperature {temperature} is just right. Growlight: {growlight_status}')
+            print(f'Temperature {temperature} is just right.')
 
         #============= Soil Moisture, Pump & Solenoid Valve
         print("/////Checking Soil Moisture, Pump & Solenoid Valve")
@@ -54,7 +54,16 @@ async def run_sensors():
         # Moist Soil = 2.6-2.7
         # Wet Soil - 1.95-1.98
         # Water - 2.07 - 2.15
-        
+
+
+         # Findings:
+        # AIR / SNO SOIL - 3.7-3.8
+        # Dry Soil - 3.6
+        # Moist Soil = 2.6-2.7
+        # Wet Soil - 2.2 
+        # Water - 2.07 - 2.15
+
+
         ### Dry Soil / Air → Lower capacitance → Higher voltage output
         ### Moist Soil → Higher capacitance → Lower voltage output
         

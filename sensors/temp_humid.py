@@ -49,5 +49,3 @@ def get_temp_humid() -> float | float:
     except Exception as error:
         print(f"Error: {error}, retrying...")
         return None, None
-
-print(get_temp_humid())

@@ -23,13 +23,16 @@ def get_devices():
 # CREATE - DEVICE
 @deviceAPI.route('/register', methods=['POST'])
 def register_device():
+    print("/register")
     try:
+        print("adding device")
         # Reference to the Firestore document
         new_device_ref = devices_ref.add({
             "createdAt": firestore.SERVER_TIMESTAMP,
             "ownerId": "",
             "deviceName": "Main System"
             })
+        print("added successfully")
 
         return jsonify({"message": "Device registered successfully", "device_id": new_device_ref[1].id}), 201
     except Exception as e:
