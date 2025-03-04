@@ -14,5 +14,5 @@ try:
     GPIO.output(RELAY_PIN, GPIO.LOW)  # Deactivate relay (pump OFF)
 except KeyboardInterrupt:
     print("Process interrupted")
-finally:
-    GPIO.cleanup()
+#finally:
+ #   GPIO.cleanup()

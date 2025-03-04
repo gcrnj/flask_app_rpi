@@ -1,4 +1,4 @@
-import cpio
+from . import cpio
 import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BCM)  # Use BCM numbering

@@ -1,8 +1,8 @@
 import RPi.GPIO as GPIO
-import cpio
+from . import cpio
 
 
-GPIO.cleanup()  # Reset any previous GPIO settings
+# GPIO.cleanup()  # Reset any previous GPIO settings
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)  # Use BCM numbering
 growlight_gpio_bus = cpio.Cpio.Growlight.value
@@ -17,7 +17,3 @@ def turn_on_growlight():
 
 def turn_off_growlight():
     GPIO.output(growlight_gpio_bus, GPIO.HIGH)  # Set GPIO pin to HIGH to turn on the grow light
-
-
-turn_off_growlight()
-print(get_growlight_status())

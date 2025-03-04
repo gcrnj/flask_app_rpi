@@ -33,5 +33,5 @@ try:
     time.sleep(5)  # Keep relays off for 2 seconds
 except Exception as error:
     print(error)
-finally:
-    GPIO.cleanup()  # Clean up GPIO settings
+# finally:
+#     GPIO.cleanup()  # Clean up GPIO settings

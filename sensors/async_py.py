@@ -1,5 +1,5 @@
 import asyncio
-import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
+from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
 import time
 
 validMaxTemperature = 28
@@ -43,27 +43,40 @@ async def run_sensors():
         print(f"Moisture3 = {moisture3}")
         
         ### Dry Soil: 3.4V – 5.0V
+    
         ### Moist Soil: 1.5V – 3.5V
         ### Wet Soil: 0.0V – 1.4V
+        ### None 3.2-3.6V
+
+        # Findings:
+        # AIR / SNO SOIL - 3.65 & 3.87
+        # Dry Soil - 3.45
+        # Moist Soil = 2.6-2.7
+        # Wet Soil - 1.95-1.98
+        # Water - 2.07 - 2.15
+        
+        ### Dry Soil / Air → Lower capacitance → Higher voltage output
+        ### Moist Soil → Higher capacitance → Lower voltage output
+        
         # pump is off
         shouldTurnPumpOn = False
 
         # Soil Moisture 1 and  Valve 1
-        if moisture1 >= 3.4:
+        if moisture1 >= 3.5:
             valve_py.turn_valve_on(1)
             shouldTurnPumpOn = True
         else:
             valve_py.turn_valve_off(1)
 
         # Valve 2
-        if moisture2 >= 3.4:
+        if moisture2 >= 3.5:
             valve_py.turn_valve_on(2)
             shouldTurnPumpOn = True
         else:
             valve_py.turn_valve_off(2)
 
         # Valve 3
-        if moisture3 >= 3.4:
+        if moisture3 >= 3.5:
             valve_py.turn_valve_on(3)
             shouldTurnPumpOn = True
         else:
@@ -82,12 +95,13 @@ async def run_sensors():
         # Delay
         time.sleep(2)
         print("\\\\")
-    
 
 
 
 
 
 
-asyncio.run(run_sensors())
 
+
+def run():
+    asyncio.run(run_sensors())
