@@ -1,5 +1,27 @@
 from . import cpio
-import RPi.GPIO as GPIO
+import sys
+
+if sys.platform == "win32":
+    print("Running on Windows - Using dummy GPIO")
+
+    class FakeGPIO:
+        BCM = "BCM"
+        OUT = "OUT"
+        LOW = "LOW"
+        HIGH = "HIGH"
+
+        def setmode(self, mode):
+            print(f"Setting GPIO mode: {mode}")
+
+        def setup(self, pin, mode):
+            print(f"Setting up GPIO pin {pin} as {mode}")
+
+        def output(self, pin, value):
+            print(f"Setting GPIO pin {pin} to {value}")
+
+    GPIO = FakeGPIO()
+else:
+    import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BCM)  # Use BCM numbering
 PUMP_PIN = cpio.Cpio.Pump.value

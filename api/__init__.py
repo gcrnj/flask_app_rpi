@@ -1,8 +1,13 @@
 from flask import Flask
 from firebase_admin import credentials, initialize_app
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current file
+cred_path = os.path.join(BASE_DIR, "firebase_key.json")  # Construct absolute path
+print(cred_path)
+cred = credentials.Certificate(cred_path)  # Use absolute path
 
 # Initialize Firebase
-cred = credentials.Certificate("api/firebase_key.json")
 default_app = initialize_app(cred)
 
 def create_app():
