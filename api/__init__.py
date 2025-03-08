@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from firebase_admin import credentials, initialize_app
 import os
 
@@ -12,6 +13,7 @@ default_app = initialize_app(cred)
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     from .deviceAPI import deviceAPI 
     from .photosAPI import photosAPI 
