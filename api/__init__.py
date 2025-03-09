@@ -9,7 +9,9 @@ print(cred_path)
 cred = credentials.Certificate(cred_path)  # Use absolute path
 
 # Initialize Firebase
-default_app = initialize_app(cred)
+default_app = initialize_app(cred, {
+    'storageBucket': 'project-corntrack.firebasestorage.app'  # Replace with your actual bucket name
+})
 
 def create_app():
     app = Flask(__name__)

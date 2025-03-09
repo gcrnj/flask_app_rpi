@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "project-corntrack",
+  "private_key_id": "d7a0676a221dbe44b691498c1eeb0068a490ec56",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC8BTBDW9czrTko\nbj1kqrVmQjYwjIh9cK4pO+hUPpS7vfVfnaxrZdr+u/VOn6Xz1eH/n7dWrYeG7Dxe\nuJpWTs6No0CHnkUVX87S+qX7GKDqX4edps58qQ8C+PuF6OsnWIorD1rT721/xLoi\np0c/Dciq2slO0YfNG3RbHVga+ZDXT9Kc30T4aiTgcz3JzrqUbmMXEszLS/6jgDEe\ndmUr48aaAjVwDqQtbXF680VY9oSrN+vcmpOkmIHqQH6AcYSkuUr9khgpP6vGzgW5\n21FMvr2odDZCTSeuhmJNZqsOhoWBgu2wDzHHcFA7r8E77kYiPbpbHqQ/pApRs4xW\nbv8zmYLHAgMBAAECggEAHvkrLGAum+yPLBoOUrfifoWCys2j1dJLBoTqxCdeYMKC\nxQJtpcWXkCY423+7mrxjE2AQF58qN9pRJE4nMqJJ2ZW0AC4HoGVHkNmfSornRfor\nFkKlOm5ZMuVUU14oOt5APfwKEObHiZLyvNmvXXObrosF5aOTylXu/ZbgbZUrkfm5\nHFtoqX2c2RecvXKUzjB04AcEhFGdUmvFt/COUmNG8B2od5CA+47N9ror9ftg91KY\nURrLji65iLyDxDQVY0GU598L0877bDiFeXfp2t0PBBANvG7GPgSk/j/duqm2VhL+\nx3Bs502F7H/3WI+2O2Z56EkaBfIcR2HWbKESoG+aHQKBgQDofkrXYKV2GFbF5air\nifHTvJpuIzdRUw5gNkdAs+Gt90W4CJrmvO6agNo4qnt+3fmcc1XS2ICHud/8qkcK\ne5nYsUH2x2aVHRCyGyevgE3zRBTtuyMGC6QIUV5lgUF/JPin3dIzs3mnQmIpcp65\nN0Ugc3G0Ng/8UsedZC43jwN2BQKBgQDPB8i5h4LVhLruuBiFYryi8aY8YG1yqVXL\n/1syg/4IovGHKAfhXqc3j0J6Yc2mFkFpxju1BEzw6x/kPp8STCV4LwulJF3zMFjA\nQdsHqs2UOAdlKSNLULNen2uI+wK92NPGoIVclcsGPbAAeoqqbMg4nqtuuOUJwGHQ\nm4CYTzKDWwKBgB14HJ5uNqrgbOdKs/WCV6/CAUUim5loULMrTh7Kbjmx1Rl9pbzH\nh+r3mDGEkoDDPCdzixZdsPUDP3v0TWrrvdV0qmrQXZVbCMm6nW4mcjr6jziO9uKG\nSTVwsulk19t44TfN6x34itwDkxOz3qCVe+KgH3J7Q8105K5zi1QpgYPNAoGBAK+R\n8F22V/PvPgAYS2NC2qpsuAdX1zl39XSst5Bdc1+rn5x5DEXJ2ZE6gqv6qUYCdbLY\nE+ZtITrmiwMrQAdqYBROAVgpQSttgrZ4ouEbrn/WDB90BaRnadYC6FUgWbDaYq59\njtt3hNdkFRAy28mvuxSZKtUZI9NjPRCF70Y7U6ElAoGBAJPMHUj9fu0M/Vc+FiQq\nHdTdShAj7fvNiLpg+kakGd9NDSrlfEsBwRqXsD3AOLDg0pxxnhoa61FmKqD5UyAd\nGW2v3ZQgfcfF3gygVuSk2fnmbXLZ5tEG6BabXPV/Z8V00QgfINPDMeKfihG9rXs7\nYLg9bzw7Z9oUG+YkZVHqFItp\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@project-corntrack.iam.gserviceaccount.com",
+  "client_id": "117980705446425532526",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40project-corntrack.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

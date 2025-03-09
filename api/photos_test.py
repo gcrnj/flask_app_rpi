@@ -1,17 +1,31 @@
-from flask import Blueprint, request, jsonify
-from firebase_admin import firestore, storage
+from flask import Flask, request, jsonify
+import firebase_admin
+from firebase_admin import credentials, storage
 from datetime import datetime, timezone, timedelta
-
-db = firestore.client()
-devices_ref = db.collection('devices')
-bucket = storage.bucket()  # Use actual bucket name
-
-photosAPI = Blueprint('photos', __name__)
-
 
 PH_TZ = timezone(timedelta(hours=8))
 
-@photosAPI.route("/<device_id>/upload-file", methods=["POST"])
+app = Flask(__name__)
+
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate("api/firebase_key2.json")
+firebase_admin.initialize_app(cred, {"storageBucket": "project-corntrack.firebasestorage.app"})  # Ensure correct bucket name
+
+bucket = storage.bucket()
+
+
+# @app.route("/get-download-url", methods=["GET"])
+# def get_download_url():
+#     blob = bucket.blob('gallery.png')
+
+#     # Generate signed URL (valid for 1 hour)
+
+#     expiration_time = datetime.now(PH_TZ) + timedelta(days=1)
+#     url = blob.generate_signed_url(expiration=expiration_time)
+#     return jsonify({"download_url": url})
+
+# Upload {"photo": "file.jpg"}
+@app.route("/<device_id>/upload-file", methods=["POST"])
 def upload_file(device_id):
     print(device_id)
     """Upload a file to Firebase Storage and return its public URL."""
@@ -51,8 +65,7 @@ def upload_file(device_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-@photosAPI.route("/<device_id>/list-files", methods=["GET"])
+@app.route("/<device_id>/list-files", methods=["GET"])
 def list_files(device_id):
     """List all uploaded files for a device grouped by date."""
     try:
@@ -87,3 +100,6 @@ def list_files(device_id):
     except Exception as e:
         print(f"❌ Error: {str(e)}")  # Debugging log
         return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
