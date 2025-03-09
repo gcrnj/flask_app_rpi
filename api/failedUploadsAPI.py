@@ -1,14 +1,13 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file, abort
 import json
 import os
 from datetime import datetime, timezone, timedelta
-import uuid
 from datetime import datetime
 
 failedUploads = Blueprint('failedUploads', __name__)
 PH_TZ = timezone(timedelta(hours=8))
 FAILED_UPLOADS_FILE = 'failed_uploads.json'
-UPLOAD_FOLDER = 'uploads'  # Folder to store failed photos
+UPLOAD_FOLDER = 'api\\static'  # Folder to store failed photos
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -98,3 +97,11 @@ def get_all_failed_uploads(device_id):
     device_data = data.get(device_id, [])
     
     return jsonify({device_id: device_data}), 200
+
+@failedUploads.route('/uploads/<filename>', methods=['GET'])
+def get_failed_uploaded_file(filename):
+    file_path = os.path.join(UPLOAD_FOLDER, filename).removeprefix('api\\')
+    print('file_path2')
+    print(file_path)
+
+    return send_file(file_path, mimetype='image/png')

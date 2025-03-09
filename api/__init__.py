@@ -14,7 +14,7 @@ default_app = initialize_app(cred, {
 })
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='uploads')
     CORS(app)
 
     from .deviceAPI import deviceAPI 
