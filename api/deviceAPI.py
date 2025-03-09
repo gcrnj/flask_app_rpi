@@ -137,7 +137,7 @@ def get_soil_moisture(device_id):
         if moisture_data:
             return jsonify(moisture_data), 200
         else:
-            return jsonify({"error": "No soil moisture readings found"}), 404
+            return jsonify({"error": "No data found in the date range."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -18,8 +18,10 @@ def create_app():
     CORS(app)
 
     from .deviceAPI import deviceAPI 
-    from .photosAPI import photosAPI 
+    from .photosAPI import photosAPI
+    from .failedUploadsAPI import failedUploads as failedUploadsAPI
 
     app.register_blueprint(deviceAPI, url_prefix='/devices')
     app.register_blueprint(photosAPI, url_prefix='/photos')
+    app.register_blueprint(failedUploadsAPI, url_prefix='/failed-uploads')
     return app
