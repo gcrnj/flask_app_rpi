@@ -47,10 +47,10 @@ def get_from_pot(pot_number: int):
                 return AnalogIn(ads, ADS.P2).voltage
             case 3:
                 return AnalogIn(ads, ADS.P3).voltage
-        return 0  # If invalid pot_number
+        return 777  # If invalid pot_number
     except Exception as e:
-        print(f"Error reading sensor: {e}. Returning 0 for pot {pot_number}")
-        return 0
+        print(f"Error reading sensor: {e}. Returning 777 for pot {pot_number}")
+        return 777
 
 ### Soil Moisture Voltage Ranges ###
 # Dry Soil: 3.4V – 5.0V

@@ -71,21 +71,21 @@ async def run_sensors():
         shouldTurnPumpOn = False
 
         # Soil Moisture 1 and  Valve 1
-        if moisture1 >= 3.5:
+        if moisture1 <= 3.6 and moisture1 > 2.7:
             valve_py.turn_valve_on(1)
             shouldTurnPumpOn = True
         else:
             valve_py.turn_valve_off(1)
 
         # Valve 2
-        if moisture2 >= 3.5:
+        if moisture2 <= 3.6 and moisture2 > 2.7:
             valve_py.turn_valve_on(2)
             shouldTurnPumpOn = True
         else:
             valve_py.turn_valve_off(2)
 
         # Valve 3
-        if moisture3 >= 3.5:
+        if moisture3 <= 3.6 and moisture3 > 2.7:
             valve_py.turn_valve_on(3)
             shouldTurnPumpOn = True
         else:
