@@ -3,6 +3,7 @@ import json
 import os
 from datetime import datetime, timezone, timedelta
 from datetime import datetime
+import requests
 
 failedUploads = Blueprint('failedUploads', __name__)
 PH_TZ = timezone(timedelta(hours=8))
@@ -105,3 +106,56 @@ def get_failed_uploaded_file(filename):
     print(file_path)
 
     return send_file(file_path, mimetype='image/png')
+
+@failedUploads.route('/<device_id>/upload', methods=['POST'])
+def uploadFailedUploads(device_id):
+    """API endpoint to manually trigger re-upload of failed uploads by calling PhotosAPI and DeviceAPI."""
+    ensure_failed_uploads_file()
+    
+    with open(FAILED_UPLOADS_FILE, 'r+') as file:
+        try:
+            data = json.load(file)
+            if not isinstance(data, dict):
+                data = {}
+        except json.JSONDecodeError:
+            data = {}
+    
+    if device_id not in data or not data[device_id]:
+        return jsonify({"message": "No failed uploads to process"}), 200
+    
+    failed_uploads = data[device_id]
+    
+    for upload in failed_uploads:
+        if upload['type'] == 'photo':
+            print('uploading photo...')
+            print(f'uploadFailedUploads - {upload['type']} - {upload['file']} - {upload['time']}')
+            files = {
+                'photo': open(upload['file'], 'rb'),  # Send photo as a file
+            }
+            data = {
+                'time': upload['time']  # Send time as form data
+            }
+            response = requests.post(
+                f"http://localhost:5000/photos/{device_id}/upload-file",
+                files=files,
+                data=data
+            )
+            if response.status_code == 200:
+                print(f"✅ Photo re-uploaded: {upload['file']}")
+            else:
+                print(f"❌ {response.status_code} Failed to re-upload photo: {upload['file']}")
+                return response.json()
+        elif upload['type'] == 'soil_moisture':
+            print('uploading soil_moisture...')
+            response = requests.post(f"http://localhost:5000/devices/{device_id}/soil_moisture", json=upload)
+            if response.status_code == 201:
+                print("✅ Soil moisture data re-uploaded")
+            else:
+                print("❌ Failed to re-upload soil moisture data")
+    
+    # Clear failed uploads after processing
+    data[device_id] = []
+    with open(FAILED_UPLOADS_FILE, 'w') as file:
+        json.dump(data, file, indent=4)
+    
+    return jsonify({"message": "Failed uploads processed successfully"}), 200

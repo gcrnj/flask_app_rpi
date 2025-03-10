@@ -28,9 +28,14 @@ def upload_file(device_id):
 
     try:
         # Get current date and time
-        now = datetime.now(PH_TZ)
+        if 'time' in request.form:
+            print('upload-file: Got time') 
+            now = datetime.fromisoformat(request.form['time'])
+        else:
+            print('upload-file: Using now time')
+            now = datetime.now(PH_TZ)
         date_str = now.strftime("%Y-%m-%d")  # e.g., 2025-03-09
-        time_str = now.strftime("%H-%M")     # e.g., 14-30 (24-hour format)
+        time_str = now.strftime("%H-%M-%S")     # e.g., 14-30 (24-hour format)
 
         # Define the storage path
         blob_path = f"captured_photos/{device_id}/{date_str}/{time_str}.jpg"
