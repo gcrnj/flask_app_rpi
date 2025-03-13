@@ -31,7 +31,7 @@ def register_device():
         # Reference to the Firestore document
         new_device_ref = devices_ref.add({
             "createdAt": firestore.SERVER_TIMESTAMP,
-            "ownerId": "",
+            "ownerId": [],
             "deviceName": "Main System"
             })
         print("added successfully")
