@@ -1,5 +1,9 @@
-from . import cpio
 import sys
+
+if  __name__ == '__main__':
+    import cpio
+else:
+    from . import cpio
 
 if sys.platform == "win32":
     print("Running on Windows - Using dummy GPIO")

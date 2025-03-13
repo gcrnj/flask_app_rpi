@@ -128,7 +128,10 @@ def uploadFailedUploads(device_id):
     for upload in failed_uploads:
         if upload['type'] == 'photo':
             print('uploading photo...')
-            print(f'uploadFailedUploads - {upload['type']} - {upload['file']} - {upload['time']}')
+            uploadType = upload['type']
+            uploadFile = upload['file']
+            uploadTime = upload['time']
+            print(f'uploadFailedUploads - {uploadType} - {uploadFile} - {uploadTime}')
             files = {
                 'photo': open(upload['file'], 'rb'),  # Send photo as a file
             }

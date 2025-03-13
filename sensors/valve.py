@@ -1,4 +1,5 @@
 import sys
+import time
 
 if sys.platform == "win32":
     print("Running on Windows - Using dummy GPIO")
@@ -22,8 +23,10 @@ if sys.platform == "win32":
 else:
     import RPi.GPIO as GPIO
 
-from . import cpio
-import time
+if  __name__ == '__main__':
+    import cpio
+else:
+    from . import cpio
 
 GPIO.setmode(GPIO.BCM)  # Use BCM numbering
 VALVE1 = cpio.Cpio.Vavle1.value
