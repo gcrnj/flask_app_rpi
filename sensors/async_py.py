@@ -60,7 +60,7 @@ async def run_sensors():
         # AIR / SNO SOIL - 3.7-3.8
         # Dry Soil - 3.6
         # Moist Soil = 2.6-2.7
-        # Wet Soil - 2.2 
+        # Wet Soil - 2.2
         # Water - 2.07 - 2.15
 
 

@@ -49,3 +49,7 @@ def get_temp_humid() -> float | float:
     except Exception as error:
         print(f"Error: {error}, retrying...")
         return None, None
+
+
+if __name__ == '__main__':
+    print(get_temp_humid())

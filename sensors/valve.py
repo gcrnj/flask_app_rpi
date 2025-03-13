@@ -62,3 +62,8 @@ def turn_valve_off(pot_number):
     print(f"Pot {pot_number}, BCM {gpio} turning off...")
     GPIO.output(gpio, GPIO.HIGH)  # Deactivate relay (valve OFF)
     print(f"Valve {pot_number} turned off")
+
+if __name__ == '__main__':
+    turn_valve_on(1)
+    turn_valve_on(2)
+    turn_valve_on(3)

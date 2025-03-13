@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from firebase_admin import firestore, storage
 from datetime import datetime, timezone, timedelta
 
@@ -92,3 +92,13 @@ def list_files(device_id):
     except Exception as e:
         print(f"❌ Error: {str(e)}")  # Debugging log
         return jsonify({"error": str(e)}), 500
+
+@photosAPI.route("/capture", methods=["GET"])
+def capture_photo():
+    from sensors import camera
+    captured_path = camera.capture_image()
+    
+    if captured_path is None:
+        return jsonify({'error': 'Cannot capture camera'}), 500
+    
+    return send_file(captured_path, mimetype='image/png')

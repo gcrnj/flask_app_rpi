@@ -43,3 +43,5 @@ def turn_off():
     GPIO.setup(PUMP_PIN, GPIO.OUT)  # Set grow light pin as output because you are sending signals to it
     GPIO.output(PUMP_PIN, GPIO.HIGH)  # Activate relay (pump ON)
     print("Pump turn off")
+
+turn_on()

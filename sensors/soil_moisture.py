@@ -56,3 +56,14 @@ def get_from_pot(pot_number: int):
 # Dry Soil: 3.4V – 5.0V
 # Moist Soil: 1.5V – 3.5V
 # Wet Soil: 0.0V – 1.4V
+
+if __name__ == '__main__':
+    import RPi.GPIO as GPIO
+    from time import sleep
+    while True:
+        print(f'Pot 1 = {get_from_pot(1)}')
+        print(f'Pot 2 = {get_from_pot(2)}')
+        print(f'Pot 3 = {get_from_pot(3)}')
+        print(f'Pot 4 = {get_from_pot(4)}')
+        print(f'===========')
+        sleep(2)
