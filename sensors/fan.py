@@ -51,4 +51,4 @@ if __name__ == '__main__':
         turn_on()
         sleep(7)
         turn_off()
-        sleep(2)
+        sleep(7)
