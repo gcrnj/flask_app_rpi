@@ -1,10 +1,15 @@
-from flask import Blueprint, Flask, send_file
+from flask import Blueprint, Flask, send_file, request, jsonify
 import qrcode
 from io import BytesIO
 
 qrCodeAPI = Blueprint('qrCodeAPI', __name__)
-@qrCodeAPI.route('/generate/<device_id>')
-def generate_qr(device_id):
+@qrCodeAPI.route('/generate')
+def generate_qr():
+    device_id = request.args.get('device_id')  # Get device_id from query parameters
+
+    if not device_id:
+        return jsonify({'error': 'device_id parameter is required'}), 400
+    
     # Generate QR Code
     qr = qrcode.make(device_id)
     
