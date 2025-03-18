@@ -44,3 +44,13 @@ def turn_on_growlight():
 
 def turn_off_growlight():
     GPIO.output(growlight_gpio_bus, GPIO.HIGH)  # Set GPIO pin to HIGH to turn on the grow light
+
+if __name__ == '__main__':
+    from time import sleep
+    while True:
+        print('Turn on GL')
+        turn_on_growlight()
+        sleep(2)
+        print('Turn off GL')
+        turn_off_growlight()
+        sleep(2)
