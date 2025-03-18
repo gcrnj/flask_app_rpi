@@ -4,6 +4,8 @@ from sensors import soil_moisture
 from sensors import temp_humid
 from datetime import datetime, timezone, timedelta
 from flask import request
+import requests
+from sensors import async_py
 
 db = firestore.client()
 devices_ref = db.collection('devices')
@@ -83,11 +85,10 @@ def get_soil_moisture(device_id):
         # Retrieve query parameters
         start_str = request.args.get('start')
         end_str = request.args.get('end')
-        pots = request.args.getlist('pots', type=int)  # Get list of pots
         water_distributed = request.args.get('water_distributed')
         print(f'water_distributed {water_distributed}')
         print('get_soil_moisture')
-        print(f'args = From {start_str} ; To {end_str} ; Pots {pots}')
+        print(f'args = From {start_str} ; To {end_str}')
 
         readings_ref = devices_ref.document(device_id).collection('moisture_readings')
 
@@ -111,8 +112,6 @@ def get_soil_moisture(device_id):
             query = query.where("time", ">=", start)  # ✅ Still use positional arguments
         if end:
             query = query.where("time", "<=", end)  # ✅ Still use positional arguments
-        if pots:
-            query = query.where("pot", "in", pots)  # ✅ Still use positional arguments
         if water_distributed is not None:
             print(f"Not none but {water_distributed}")
             query = query.where("water_distributed", "==", water_distributed == 'true')  # ✅ Still use positional arguments
@@ -147,22 +146,33 @@ def add_temperature(device_id):
     try:
         # Get request data
         try:
-            data = request.get_json()
+            data = async_py.run_sensors()
         except Exception as e:
-            return jsonify({"error": "Missing required field: Pot and Time"}), 400
+            return jsonify({"error": f"Error in asunc_py {e}"}), 400
 
-        pot = data.get("pot")
-        time = data.get("time")
-        water_distributed = data.get("water_distributed", False)  # Default to False if not provided
-        print(f'water_distributed {water_distributed}')
-
-        if pot is None:
-            return jsonify({"error": "Missing required field: Pot"}), 400
-        if time is None:
-            return jsonify({"error": "Missing required field: Time"}), 400
         
-        moisture = soil_moisture.get_from_pot(pot)
-        temperature, humidity = temp_humid.get_temp_humid()
+        # time = data.get("time")
+        water_distributed = data["water_distributed"]  # Default to False if not provided
+        moisture1 = data['moisture1']
+        moisture2 = data['moisture2']
+        moisture3 = data['moisture3']
+        temperature = data['temperature']
+        humidity = data['humidity']
+        print(f'Got data: {data}')
+
+        if water_distributed is None:
+            return jsonify({"error": "Missing required field: water_distributed"}), 400
+        if moisture1 is None:
+            return jsonify({"error": "Missing required field: moisture1"}), 400
+        if moisture2 is None:
+            return jsonify({"error": "Missing required field: moisture2"}), 400
+        if moisture3 is None:
+            return jsonify({"error": "Missing required field: moisture3"}), 400
+        if temperature is None:
+            return jsonify({"error": "Missing required field: temperature"}), 400
+        if humidity is None:
+            return jsonify({"error": "Missing required field: humidity"}), 400
+        
 
         # Reference to the moisture_readings subcollection
         readings_ref = devices_ref.document(device_id).collection("moisture_readings")
@@ -172,17 +182,27 @@ def add_temperature(device_id):
         # Convert string time to datetime object
 
         date_time = datetime.now(PH_TZ)
-        print(f'Adding Pot {pot} ; Time {date_time}')
 
-        new_doc_ref = readings_ref.add({
-            "pot": pot,
-            "moisture": moisture,
+        post_data = {
+            "moisture1": moisture1,
+            "moisture2": moisture2,
+            "moisture3": moisture3,
             "temperature": temperature,
             "humidiity": humidity,
             "time": date_time,
             "water_distributed": water_distributed
-        })
+        }
+        new_doc_ref = readings_ref.add(post_data)
 
-        return jsonify({"message": f"Soil Moisture ({moisture}), Temperature({temperature}) and Humidity ({humidity}) added successfully", "id": new_doc_ref[1].id}), 201
+        # Check if the document was added successfully
+        if new_doc_ref:
+            print('Doc Added successfully')
+            return jsonify({"message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully"}), 200
+        else:
+            response = requests.post(
+                f"http://localhost:5000/photos/{device_id}/upload-file",
+                data=post_data
+            )
+            return jsonify({'error': 'Failed to upload data'}), 502
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f'Exception in add_temperature: {str(e)}'}), 501

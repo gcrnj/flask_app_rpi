@@ -36,12 +36,14 @@ else:
     import RPi.GPIO as GPIO
     import adafruit_dht
     import board
-    DHT_SENSOR = adafruit_dht.DHT11(board.D5)
 
 def get_temp_humid() -> float | float:
+    GPIO.cleanup()
+    DHT_SENSOR = adafruit_dht.DHT11(board.D5)
     try:
         temperature = DHT_SENSOR.temperature
         humidity = DHT_SENSOR.humidity
+        print(f'get_temp_humid = {temperature} / {humidity}')
         return temperature, humidity
     except RuntimeError as error:
         print(f"Error: {error}, retrying...")

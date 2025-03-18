@@ -1,26 +1,41 @@
-import asyncio
 from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
 import time
 
 validMaxTemperature = 28
 validMinTemperature = 33
 
-async def run_sensors():
-    await asyncio.sleep(2)
+def run_sensors():
+    time.sleep(0.5)
+    temp = 0
+    humid = 0
+    isValve1On = False
+    isValve2On = False
+    isValve3On = False
+    soilMoisture1 = 0
+    soilMoisture2 = 0
+    soilMoisture3 = 0
+    isPumpOn = False
+    isGrowLightOn = False
+    isAPICalled = False
 
-    running_pumps = []
-    isLightOn = False
 
-    while True:
+    
+    while not isAPICalled:
         #============= DHT11 & Growlight
         print("/////Checking DHT11 & Growlight")
         temperature, humidity = temperature_py.get_temp_humid()
+        print(f'Got {temperature} / {humidity}')
+        if temperature != None:
+            print("/////DHT11 & Growlight None")
+            temp = temperature
+            humid = humidity
         # growlight_status =  growlight_py.get_growlight_status()
         if temperature == None:
             print("Error temperature")
         elif temperature < 28:
             # Turn on growlight
             print(f'Temperature {temperature} is too low. Turning on growlight.')
+            isGrowLightOn = True
             growlight_py.turn_on_growlight()
         elif temperature > 27:
             # Turn off growlight
@@ -31,17 +46,17 @@ async def run_sensors():
 
         #============= Soil Moisture, Pump & Solenoid Valve
         print("/////Checking Soil Moisture, Pump & Solenoid Valve")
-        pumpStatus = pump_py.get_pump_status()
         moisture1 = moisture_py.get_from_pot(1)
+        print(f"Moisture1 = {moisture1}")
         moisture2 = moisture_py.get_from_pot(2)
+        print(f"Moisture2 = {moisture2}")
         moisture3 = moisture_py.get_from_pot(3)
+        print(f"Moisture3 = {moisture3}")
         valve1 = valve_py.get_valve_status(1)
         valve2 = valve_py.get_valve_status(2)
         valve3 = valve_py.get_valve_status(3)
-        print(f"Moisture1 = {moisture1}")
-        print(f"Moisture2 = {moisture2}")
-        print(f"Moisture3 = {moisture3}")
-        
+        print("/////Done getting the data")
+
         ### Dry Soil: 3.4V – 5.0V
     
         ### Moist Soil: 1.5V – 3.5V
@@ -67,11 +82,20 @@ async def run_sensors():
         ### Dry Soil / Air → Lower capacitance → Higher voltage output
         ### Moist Soil → Higher capacitance → Lower voltage output
         
+
+        if moisture1 != 777:
+            soilMoisture1 = moisture1
+        if moisture2 != 777:
+            soilMoisture2 = moisture2
+        if moisture3 != 777:
+            soilMoisture3 = moisture3
+
         # pump is off
         shouldTurnPumpOn = False
 
         # Soil Moisture 1 and  Valve 1
         if moisture1 <= 3.6 and moisture1 > 2.7:
+            isValve1On = True
             valve_py.turn_valve_on(1)
             shouldTurnPumpOn = True
         else:
@@ -79,6 +103,7 @@ async def run_sensors():
 
         # Valve 2
         if moisture2 <= 3.6 and moisture2 > 2.7:
+            isValve2On = True
             valve_py.turn_valve_on(2)
             shouldTurnPumpOn = True
         else:
@@ -86,24 +111,36 @@ async def run_sensors():
 
         # Valve 3
         if moisture3 <= 3.6 and moisture3 > 2.7:
+            isValve3On = True
             valve_py.turn_valve_on(3)
             shouldTurnPumpOn = True
         else:
             valve_py.turn_valve_off(3)
         
-        time
-
         # Turn or off Pump
         if shouldTurnPumpOn:
+            isPumpOn = True
             pump_py.turn_on()
             print("Pump is On")
         else:
             pump_py.turn_off()
             print("Pump is Off")
 
-        # Delay
-        time.sleep(2)
         print("\\\\")
+        if temp != 0 and humid != 0 and soilMoisture1 != 0 and soilMoisture2 != 0 and soilMoisture3 != 0 and not isAPICalled:
+            # Call API
+            isAPICalled = True
+            return {
+                'water_distributed': isPumpOn,
+                'moisture1': moisture1,
+                'moisture2': moisture2,
+                'moisture3': moisture3,
+                'temperature': temperature,
+                'humidity': humidity,
+                'light': isGrowLightOn
+            }
+        time.sleep(0.5)
+        
 
 
 
@@ -113,4 +150,5 @@ async def run_sensors():
 
 
 def run():
-    asyncio.run(run_sensors())
+    print('')
+    # asyncio.run(run_sensors())

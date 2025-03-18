@@ -28,12 +28,12 @@ if  __name__ == '__main__':
 else:
     from . import cpio
 
-GPIO.setmode(GPIO.BCM)  # Use BCM numbering
 VALVE1 = cpio.Cpio.Vavle1.value
 VALVE2 = cpio.Cpio.Vavle2.value
 VALVE3 = cpio.Cpio.Vavle3.value
 
 def set_output_bcms():
+    GPIO.setmode(GPIO.BCM)  # Use BCM numbering
     GPIO.setup(VALVE1, GPIO.OUT)  # Set valve pins as output
     GPIO.setup(VALVE2, GPIO.OUT)
     GPIO.setup(VALVE3, GPIO.OUT)
