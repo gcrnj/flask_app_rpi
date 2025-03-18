@@ -20,8 +20,10 @@ def create_app():
     from .deviceAPI import deviceAPI 
     from .photosAPI import photosAPI
     from .failedUploadsAPI import failedUploads as failedUploadsAPI
+    from .qrCodeAPI import qrCodeAPI
 
     app.register_blueprint(deviceAPI, url_prefix='/devices')
     app.register_blueprint(photosAPI, url_prefix='/photos')
     app.register_blueprint(failedUploadsAPI, url_prefix='/failed-uploads')
+    app.register_blueprint(qrCodeAPI, url_prefix='/qrcode')
     return app
