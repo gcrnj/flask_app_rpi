@@ -14,3 +14,4 @@ class Cpio(Enum):
     Temperature = 5
     SDA1 = 2
     SCL1 = 2
+    Fan = 21

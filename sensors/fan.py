@@ -28,26 +28,27 @@ else:
     import RPi.GPIO as GPIO
 
 GPIO.setmode(GPIO.BCM)  # Use BCM numbering
-PUMP_PIN = cpio.Cpio.Pump.value
-GPIO.setup(PUMP_PIN, GPIO.OUT)  # Set grow light pin as output because you are sending signals to it
+FAN_PIN = cpio.Cpio.Fan.value
+GPIO.setup(FAN_PIN, GPIO.OUT)  # Set fan pin as output
 
-def get_pump_status() -> bool:
+def get_fan_status() -> bool:
     return True
 
 def turn_on():
-    GPIO.setup(PUMP_PIN, GPIO.OUT)  # Set grow light pin as output because you are sending signals to it
-    GPIO.output(PUMP_PIN, GPIO.LOW)  # Activate relay (pump ON)
-    print("Pump turned on")
+    GPIO.setup(FAN_PIN, GPIO.OUT)
+    GPIO.output(FAN_PIN, GPIO.LOW)  # Activate relay (fan ON)
+    print("Fan turned on")
 
 def turn_off():
-    GPIO.setup(PUMP_PIN, GPIO.OUT)  # Set grow light pin as output because you are sending signals to it
-    GPIO.output(PUMP_PIN, GPIO.HIGH)  # Activate relay (pump ON)
-    print("Pump turn off")
+    GPIO.setup(FAN_PIN, GPIO.OUT)
+    GPIO.output(FAN_PIN, GPIO.HIGH)  # Deactivate relay (fan OFF)
+    print("Fan turned off")
+
 
 if __name__ == '__main__':
     from time import sleep
     while True:
         turn_on()
-        sleep(3)
+        sleep(7)
         turn_off()
-        sleep(3)        
+        sleep(2)
