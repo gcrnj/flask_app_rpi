@@ -206,22 +206,19 @@ def add_temperature(device_id):
                 doc_id = '...' 
             return jsonify({'doc_id': doc_id, "message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully"}), 200
         else:
-            response = requests.post(
+            failed_upload_respones  = call_failed_uploads(device_id, post_data)
+            print(f'Response {failed_upload_respones.json()}')
+            return jsonify({'error': 'Failed to upload data'}), 502
+    except Exception as e:
+        failed_upload_respones  = call_failed_uploads(device_id, post_data)
+        print(f'Response {failed_upload_respones.json()}') 
+        return jsonify({"error": f'Exception in add_temperature: {str(e)}'}), 501
+    
+def call_failed_uploads(device_id, post_data, photo):
+    return requests.post(
                 f"http://localhost:5000/failed-uploads/{device_id}/failed_upload",
                 json=post_data,
                 headers={
                     'Content-Type': 'application/json'
                 }
             )
-            print(f'Response {response.json()}')
-            return jsonify({'error': 'Failed to upload data'}), 502
-    except Exception as e:
-        response = requests.post(
-            f"http://localhost:5000/failed-uploads/{device_id}/failed_upload",
-            json=post_data,
-            headers={
-                'Content-Type': 'application/json'
-            }
-        )
-        print(f'Response {response.json()}') 
-        return jsonify({"error": f'Exception in add_temperature: {str(e)}'}), 501
