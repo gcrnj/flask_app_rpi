@@ -6,6 +6,8 @@ if sys.platform == "win32":
     class FakeBoard:
         SCL = "SCL"
         SDA = "SDA"
+        D5 = "D5"
+        D6 = "D6"
 
     class FakeGPIO:
         BCM = "BCM"
@@ -16,6 +18,9 @@ if sys.platform == "win32":
         def setmode(self, mode):
             print(f"Setting GPIO mode: {mode}")
 
+        def cleanup(self):
+            cleanup = True
+
         def setup(self, pin, mode):
             print(f"Setting up GPIO pin {pin} as {mode}")
 
@@ -25,6 +30,8 @@ if sys.platform == "win32":
     GPIO = FakeGPIO()
 
     class FakeDHT:
+        temperature = 25
+        humidity = 25
         def __init__(self, sensor, pin):
             self.temperature = 25.0  # Dummy temperature value
             self.humidity = 50.0  # Dummy humidity value
@@ -39,7 +46,6 @@ else:
 
 def get_temp_humid() -> float | float:
     GPIO.cleanup()
-    DHT_SENSOR = adafruit_dht.DHT11(board.D5)
     try:
         temperature = DHT_SENSOR.temperature
         humidity = DHT_SENSOR.humidity

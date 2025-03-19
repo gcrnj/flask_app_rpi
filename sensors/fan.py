@@ -13,6 +13,7 @@ if sys.platform == "win32":
         OUT = "OUT"
         LOW = "LOW"
         HIGH = "HIGH"
+        
 
         def setmode(self, mode):
             print(f"Setting GPIO mode: {mode}")

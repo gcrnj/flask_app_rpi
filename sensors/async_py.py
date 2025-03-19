@@ -1,5 +1,6 @@
 from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
 import time
+import sys
 
 validMaxTemperature = 28
 validMinTemperature = 33
@@ -17,6 +18,7 @@ def run_sensors():
     isPumpOn = False
     isGrowLightOn = False
     isAPICalled = False
+    start_time = time.time()  # Record the start time
 
 
     
@@ -127,7 +129,12 @@ def run_sensors():
             print("Pump is Off")
 
         print("\\\\")
-        if temp != 0 and humid != 0 and soilMoisture1 != 0 and soilMoisture2 != 0 and soilMoisture3 != 0 and not isAPICalled:
+
+        isWindows = sys.platform == "win32"
+        elapsed_time = time.time() - start_time
+        print(f"Elapsed Time: {elapsed_time:.2f} seconds")
+
+        if (temp != 0 and humid != 0 and soilMoisture1 != 0 and soilMoisture2 != 0 and soilMoisture3 != 0 and not isAPICalled) or isWindows:
             # Call API
             isAPICalled = True
             return {

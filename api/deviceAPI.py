@@ -195,14 +195,33 @@ def add_temperature(device_id):
         new_doc_ref = readings_ref.add(post_data)
 
         # Check if the document was added successfully
+        post_data['type'] = 'soil_moisture'
+        post_data['time'] = date_time.isoformat()
         if new_doc_ref:
             print('Doc Added successfully')
-            return jsonify({"message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully"}), 200
+            doc_id = ''
+            try:
+                doc_id = new_doc_ref[1].id
+            except:
+                doc_id = '...' 
+            return jsonify({'doc_id': doc_id, "message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully"}), 200
         else:
             response = requests.post(
-                f"http://localhost:5000/photos/{device_id}/upload-file",
-                data=post_data
+                f"http://localhost:5000/failed-uploads/{device_id}/failed_upload",
+                json=post_data,
+                headers={
+                    'Content-Type': 'application/json'
+                }
             )
+            print(f'Response {response.json()}')
             return jsonify({'error': 'Failed to upload data'}), 502
     except Exception as e:
+        response = requests.post(
+            f"http://localhost:5000/failed-uploads/{device_id}/failed_upload",
+            json=post_data,
+            headers={
+                'Content-Type': 'application/json'
+            }
+        )
+        print(f'Response {response.json()}') 
         return jsonify({"error": f'Exception in add_temperature: {str(e)}'}), 501
