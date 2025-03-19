@@ -193,6 +193,7 @@ def add_temperature(device_id):
             "water_distributed": water_distributed
         }
         new_doc_ref = readings_ref.add(post_data)
+        added_post_data = post_data
 
         # Check if the document was added successfully
         post_data['type'] = 'soil_moisture'
@@ -204,7 +205,11 @@ def add_temperature(device_id):
                 doc_id = new_doc_ref[1].id
             except:
                 doc_id = '...' 
-            return jsonify({'doc_id': doc_id, "message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully"}), 200
+            return jsonify({
+                'doc_id': doc_id,
+                "message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully",
+                'added_post_data': added_post_data
+                }), 200
         else:
             failed_upload_respones  = call_failed_uploads(device_id, post_data)
             print(f'Response {failed_upload_respones.json()}')

@@ -85,11 +85,11 @@ def run_sensors():
         ### Moist Soil → Higher capacitance → Lower voltage output
         
 
-        if moisture1 != 777:
+        if moisture1 != 0:
             soilMoisture1 = moisture1
-        if moisture2 != 777:
+        if moisture2 != 0:
             soilMoisture2 = moisture2
-        if moisture3 != 777:
+        if moisture3 != 0:
             soilMoisture3 = moisture3
 
         # pump is off
