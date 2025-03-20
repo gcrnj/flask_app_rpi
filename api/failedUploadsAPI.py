@@ -51,7 +51,7 @@ def add_failed_upload_endpoint(device_id):
     
     # Handling file uploads
     if request.form.get('type') == 'photo':
-        print(f'g={request.files['file']}')
+        #print(f'g={request.files['file']}')
         if 'file' not in request.files:
             return jsonify({"error": "Missing file"}), 400
         

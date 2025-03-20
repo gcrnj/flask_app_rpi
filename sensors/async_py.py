@@ -49,7 +49,9 @@ def run_sensors(should_get_first_data):
             print(f'Temperature {temperature} is just right.')
         
         # HUMIDITY 50 - 80
-        if humidity > 80:
+        if temperature == None:
+            print('Error in humidity')
+        elif humidity > 80:
             fan_done = True
 
 

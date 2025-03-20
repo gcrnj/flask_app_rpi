@@ -1,5 +1,5 @@
 import sys
-
+import time
 if sys.platform == "win32":
     print("Running on Windows - Using dummy GPIO")
 
@@ -45,20 +45,23 @@ else:
     import board
 
     GPIO.cleanup()
-    DHT_SENSOR = adafruit_dht.DHT11(board.D5)
+    DHT_SENSOR = adafruit_dht.DHT11(board.D17)
 
 def get_temp_humid() -> float | float:
-    try:
-        temperature = DHT_SENSOR.temperature
-        humidity = DHT_SENSOR.humidity
-        print(f'get_temp_humid = {temperature} / {humidity}')
-        return temperature, humidity
-    except RuntimeError as error:
-        print(f"Error: {error}, retrying...")
-        return None, None
-    except Exception as error:
-        print(f"Error: {error}, retrying...")
-        return None, None
+    temperature = None
+    humidity = None
+    while temperature is None or humidity is None:
+        try:
+            temperature = DHT_SENSOR.temperature
+            humidity = DHT_SENSOR.humidity
+            print(f'get_temp_humid = {temperature} / {humidity}')
+        except RuntimeError as error:
+            print(f"Error: {error}, retrying...")
+            time.sleep(1)
+        except Exception as error:
+            print(f"Error: {error}, retrying...")
+            time.sleep(1)
+    return temperature, humidity
 
 
 if __name__ == '__main__':
