@@ -6,12 +6,30 @@ from datetime import datetime, timezone, timedelta
 from flask import request
 import requests
 from sensors import async_py
+import threading
 
 db = firestore.client()
 devices_ref = db.collection('devices')
 
 deviceAPI = Blueprint('deviceAPI', __name__)
 PH_TZ = timezone(timedelta(hours=8))
+
+# For starting sensors
+initial_data = {}
+def get_sensors_data():
+    global initial_data
+    initial_data = async_py.run_sensors_in_background()
+    return initial_data
+
+def start():
+    sensor_thread = threading.Thread(target=get_sensors_data, daemon=True)
+    sensor_thread.start()
+    return {"message": "Sensors started", "initial_data": initial_data}
+
+print(f'__name__ = {__name__}')
+if __name__ == 'api.deviceAPI':
+    start()
+
 
 # All Devices
 # Todo - Remove - vulneribility issue
@@ -27,6 +45,7 @@ def get_devices():
 # CREATE - DEVICE
 @deviceAPI.route('/register', methods=['POST'])
 def register_device():
+    start()
     print("/register")
     try:
         print("adding device")
@@ -146,7 +165,7 @@ def add_temperature(device_id):
     try:
         # Get request data
         try:
-            data = async_py.run_sensors()
+            data = initial_data
         except Exception as e:
             return jsonify({"error": f"Error in asunc_py {e}"}), 400
 
@@ -218,10 +237,11 @@ def add_temperature(device_id):
             return jsonify({'error': 'Failed to upload data'}), 502
     except Exception as e:
         failed_upload_respones  = call_failed_uploads(device_id, post_data)
-        print(f'Response {failed_upload_respones.json()}') 
+        print(f'Response {failed_upload_respones.json()}')
+        print(e)
         return jsonify({"error": f'Exception in add_temperature: {str(e)}'}), 501
     
-def call_failed_uploads(device_id, post_data, photo):
+def call_failed_uploads(device_id, post_data):
     return requests.post(
                 f"http://localhost:5000/failed-uploads/{device_id}/failed_upload",
                 json=post_data,
@@ -242,5 +262,8 @@ def send_notification(device_id, post_data):
     #     }
     # post_data['type'] = 'soil_moisture'
     # post_data['time'] = date_time.isoformat()
-    from notification import send_push_notification
-    send_push_notification(device_id, post_data)
+    from api import notification
+    try:
+        notification.send_push_notification(device_id, post_data)
+    except Exception as e:
+        print(f'Error in send_notification - {e}')

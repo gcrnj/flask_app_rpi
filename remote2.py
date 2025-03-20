@@ -1,18 +1,25 @@
-import RPi.GPIO as GPIO
-import time
+from flask import Flask, jsonify
+import threading
+from sensors import async_py
 
-RELAY_PIN = 16  # GPIO Bus16
+app = Flask(__name__)
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(RELAY_PIN, GPIO.OUT)
+# Global variable to store initial data
+initial_data = {}
 
-try:
-    print("Turning ON Water Pump")
-    GPIO.output(RELAY_PIN, GPIO.LOW)  # Activate relay (pump ON)
-    time.sleep(5)  # Run pump   for 5 seconds
-    print("Turning OFF Water Pump")
-    GPIO.output(RELAY_PIN, GPIO.HIGH)  # Deactivate relay (pump OFF)
-except KeyboardInterrupt:
-    print("Process interrupted")
-finally:
-    pass  
+def start_sensors():
+    global initial_data
+    initial_data = async_py.run_sensors_in_background()
+
+@app.route('/start', methods=['GET'])
+def start():
+    sensor_thread = threading.Thread(target=start_sensors, daemon=True)
+    sensor_thread.start()
+    return jsonify({"message": "Sensors started", "initial_data": initial_data})
+
+@app.route('/status', methods=['GET'])
+def get_status():
+    return jsonify(initial_data)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

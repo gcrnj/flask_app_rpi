@@ -1,11 +1,12 @@
 from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
 import time
 import sys
+import threading
 
 validMaxTemperature = 28
 validMinTemperature = 33
 
-def run_sensors():
+def run_sensors(should_get_first_data):
     time.sleep(0.5)
     soilMoisture1 = 0
     soilMoisture2 = 0
@@ -18,8 +19,6 @@ def run_sensors():
     water_pump_done = False
     fan_done = False
 
-    round = 0
-    first_data = {}
 
     
     while not growlight_done or not water_pump_done or not fan_done:
@@ -136,8 +135,9 @@ def run_sensors():
         elapsed_time = time.time() - start_time
         print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
-        if round == 0:
-            first_data = {
+        if should_get_first_data:
+            print('Returning initial_data')
+            return {
                 'water_distributed': isPumpOn,
                 'moisture1': moisture1,
                 'moisture2': moisture2,
@@ -146,22 +146,20 @@ def run_sensors():
                 'humidity': humidity,
                 'light': isGrowLightOn
             }
-        round += 1
+        else:
+            print('Not returning initial_data')
+
 
         print('\n===================\n')
         time.sleep(2)
 
-    return first_data
-
         
 
+def run_sensors_in_background():
+    initial_data = run_sensors(True)
+    sensor_thread = threading.Thread(target=run_sensors, args=(False,), daemon=True)
+    sensor_thread.start()
+    return initial_data
 
-
-
-
-
-
-
-def run():
-    print('')
-    # asyncio.run(run_sensors())
+if __name__ == '__main__':
+    print('Run in remote2.py')

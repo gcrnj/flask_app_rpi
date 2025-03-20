@@ -12,7 +12,6 @@ class UserDevice:
 
 # Load Firebase credentials
 cred = credentials.Certificate("api/firebase_key2.json")
-firebase_admin.initialize_app(cred, {"storageBucket": "project-corntrack.firebasestorage.app"})  # Ensure correct bucket name
 
 db = firestore.client()
 PH_TZ = timezone(timedelta(hours=8))
@@ -47,6 +46,7 @@ def send_push_notification(device_id, post_data):
     """Fetch tokens dynamically and send push notifications."""
     final_message = generate_notification_message(post_data)
     user_devices: List[UserDevice] = get_device_tokens(device_id)
+    time = post_data['time']
     if not user_devices:
         print("Error: No valid tokens found for the device.")
         return
@@ -54,7 +54,7 @@ def send_push_notification(device_id, post_data):
     messages = []
     for user in user_devices:
         title = f"Hello, {user.name}! Corntrack Update!"
-        body = message
+        body = final_message
         for token in user.tokens:
             messages.append(messaging.Message(
                 notification=messaging.Notification(
@@ -65,8 +65,8 @@ def send_push_notification(device_id, post_data):
             ))
             print(f'Sending to: {user.name}\n')
             print(f'Tokens: {user.tokens}\n')
-            print(f'Message:\n {message}\n')
-        add_notification_to_firebase(user.userId, title, body)
+            print(f'Message:\n {final_message}\n')
+        add_notification_to_firebase(user.userId, title, body, time)
 
     response = messaging.send_each(messages)  # Send to multiple tokens
     print(f"Successfully sent messages: {response}")
@@ -81,13 +81,13 @@ def send_push_notification(device_id, post_data):
     print(f"Total messages sent: {response.success_count}/{len(messages)}")
 
 
-def add_notification_to_firebase(user_id, title, body):
+def add_notification_to_firebase(user_id, title, body, time):
     """Add a notification entry to Firestore under users/{user_id}/notifications."""
     notifications_ref = db.collection("users").document(user_id).collection("notifications")
     notifications_ref.add({
         "title": title,
         "body": body,
-        "time": datetime.now(PH_TZ),
+        "time": time,
         "is_read": False
     })
 
@@ -111,7 +111,7 @@ def generate_notification_message(post_data):
     moisture3 = post_data['moisture3']
     temperature = post_data['temperature']
     humidity = post_data['humidiity']
-    time = post_data['date_time']
+    time = post_data['time']
     water_distributed = post_data['water_distributed']
 
     valves_triggered = []
@@ -135,13 +135,14 @@ def generate_notification_message(post_data):
     return "\n".join(messages)
 
 if __name__ == '__main__':
+    firebase_admin.initialize_app(cred, {"storageBucket": "project-corntrack.firebasestorage.app"})  # Ensure correct bucket name
     post_data = {
         "moisture1": 3.0,
         "moisture2": 4.0,
         "moisture3": 2.5,
         "temperature": 26,
         "humidiity": 60,
-        "date_time": "2025-03-20 10:30 AM",
+        "time": "2025-03-20 10:30 AM",
         "water_distributed": True
     }
     message = generate_notification_message(post_data)
