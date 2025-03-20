@@ -63,6 +63,7 @@ def add_failed_upload_endpoint(device_id):
         file_extension = file.filename.rsplit('.', 1)[-1].lower()
         filename = f"{device_id}-{timestamp}.{file_extension}"
         data = {}
+        file_path = ''
         try:
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
@@ -72,7 +73,7 @@ def add_failed_upload_endpoint(device_id):
                 "time": datetime.now(PH_TZ).isoformat()
             }
         except FileNotFoundError as e:
-            return jsonify({"error": f'{e.strerror}'}), 400
+            return jsonify({"error": f'{file_path} - {e.strerror}'}), 400
     
     # Handling JSON payloads (e.g., sensor data)
     elif request.is_json:
@@ -156,6 +157,7 @@ def uploadFailedUploads(device_id):
                 print(f"❌ {response.status_code} Failed to re-upload photo: {upload['file']}")
                 return response.json()
         elif upload['type'] == 'soil_moisture':
+            print(f'eee-{response.text}')
             print('uploading soil_moisture...')
             response = requests.post(f"http://localhost:5000/devices/{device_id}/soil_moisture", json=upload)
             if response.status_code == 201:

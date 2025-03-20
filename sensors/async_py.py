@@ -39,7 +39,7 @@ def run_sensors():
             print(f'Temperature {temperature} is too low. Turning on growlight.')
             isGrowLightOn = True
             growlight_py.turn_on_growlight()
-        elif temperature > 27:
+        elif temperature > 33:
             # Turn off growlight
             print(f'Temperature {temperature} is too high. Turning off growlight.')
             growlight_py.turn_off_growlight()

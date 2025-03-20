@@ -204,7 +204,9 @@ def add_temperature(device_id):
             try:
                 doc_id = new_doc_ref[1].id
             except:
-                doc_id = '...' 
+                doc_id = '...'
+            # SEND NOTIFICATION
+            send_notification(device_id, post_data)
             return jsonify({
                 'doc_id': doc_id,
                 "message": f"Soil Moisture 1 ({moisture1}), Soil Moisture 2 ({moisture2}), Soil Moisture 3 ({moisture3}), Temperature({temperature}) and Humidity ({humidity}) added successfully",
@@ -227,3 +229,18 @@ def call_failed_uploads(device_id, post_data, photo):
                     'Content-Type': 'application/json'
                 }
             )
+
+def send_notification(device_id, post_data):
+    # {
+    #         "moisture1": moisture1,
+    #         "moisture2": moisture2,
+    #         "moisture3": moisture3,
+    #         "temperature": temperature,
+    #         "humidiity": humidity,
+    #         "time": date_time,
+    #         "water_distributed": water_distributed
+    #     }
+    # post_data['type'] = 'soil_moisture'
+    # post_data['time'] = date_time.isoformat()
+    from notification import send_push_notification
+    send_push_notification(device_id, post_data)
