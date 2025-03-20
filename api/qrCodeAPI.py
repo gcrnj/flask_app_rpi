@@ -3,10 +3,8 @@ import qrcode
 from io import BytesIO
 
 qrCodeAPI = Blueprint('qrCodeAPI', __name__)
-@qrCodeAPI.route('/generate')
-def generate_qr():
-    device_id = request.args.get('device_id')  # Get device_id from query parameters
-
+@qrCodeAPI.route('/generate/<device_id>')
+def generate_qr(device_id):
     if not device_id:
         return jsonify({'error': 'device_id parameter is required'}), 400
     
