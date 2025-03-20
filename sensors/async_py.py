@@ -7,31 +7,32 @@ validMinTemperature = 33
 
 def run_sensors():
     time.sleep(0.5)
-    temp = 0
-    humid = 0
-    isValve1On = False
-    isValve2On = False
-    isValve3On = False
     soilMoisture1 = 0
     soilMoisture2 = 0
     soilMoisture3 = 0
     isPumpOn = False
     isGrowLightOn = False
-    isAPICalled = False
     start_time = time.time()  # Record the start time
 
+    growlight_done = False
+    water_pump_done = False
+    fan_done = False
+
+    round = 0
+    first_data = {}
 
     
-    while not isAPICalled:
-        #============= DHT11 & Growlight
+    while not growlight_done or not water_pump_done or not fan_done:
+        # ==========================================================
+        # ================ GROWLIGHT AND DHT11  ======================
+        # ==========================================================
+
         print("/////Checking DHT11 & Growlight")
+
         temperature, humidity = temperature_py.get_temp_humid()
         print(f'Got {temperature} / {humidity}')
-        if temperature != None:
-            print("/////DHT11 & Growlight None")
-            temp = temperature
-            humid = humidity
-        # growlight_status =  growlight_py.get_growlight_status()
+
+        # TEMPERATURE 28 - 33
         if temperature == None:
             print("Error temperature")
         elif temperature < 28:
@@ -41,23 +42,29 @@ def run_sensors():
             growlight_py.turn_on_growlight()
         elif temperature > 33:
             # Turn off growlight
+            growlight_done = True
             print(f'Temperature {temperature} is too high. Turning off growlight.')
             growlight_py.turn_off_growlight()
         else:
+            growlight_done = True
             print(f'Temperature {temperature} is just right.')
+        
+        # HUMIDITY 50 - 80
+        if humidity > 80:
+            fan_done = True
 
-        #============= Soil Moisture, Pump & Solenoid Valve
-        print("/////Checking Soil Moisture, Pump & Solenoid Valve")
+
+        # ====================================================================
+        # =================== PUMP AND SOIL MOISTURE =========================
+        # ====================================================================
+        print("///// Start PUMP AND SOIL MOISTURE")
         moisture1 = moisture_py.get_from_pot(1)
-        print(f"Moisture1 = {moisture1}")
         moisture2 = moisture_py.get_from_pot(2)
-        print(f"Moisture2 = {moisture2}")
         moisture3 = moisture_py.get_from_pot(3)
+        print(f"Moisture1 = {moisture1}")
+        print(f"Moisture2 = {moisture2}")
         print(f"Moisture3 = {moisture3}")
-        valve1 = valve_py.get_valve_status(1)
-        valve2 = valve_py.get_valve_status(2)
-        valve3 = valve_py.get_valve_status(3)
-        print("/////Done getting the data")
+        print("///// Done PUMP AND SOIL MOISTURE")
 
         ### Dry Soil: 3.4V – 5.0V
     
@@ -83,50 +90,45 @@ def run_sensors():
 
         ### Dry Soil / Air → Lower capacitance → Higher voltage output
         ### Moist Soil → Higher capacitance → Lower voltage output
+
+        isValve1On = False
+        isValve2On = False
+        isValve3On = False
         
+        # ===================================================================
+        # ===================== WATER PUMP AND VALVES 1-3 ===================
+        # ===================================================================
+        if not water_pump_done:
+            # Soil Moisture 1 and  Valve 1
+            if moisture1 <= 3.6 and moisture1 > 2.7:
+                isValve1On = True
+                valve_py.turn_valve_on(1)
+            else:
+                valve_py.turn_valve_off(1)
 
-        if moisture1 != 0:
-            soilMoisture1 = moisture1
-        if moisture2 != 0:
-            soilMoisture2 = moisture2
-        if moisture3 != 0:
-            soilMoisture3 = moisture3
+            # Valve 2
+            if moisture2 <= 3.6 and moisture2 > 2.7:
+                isValve2On = True
+                valve_py.turn_valve_on(2)
+            else:
+                valve_py.turn_valve_off(2)
 
-        # pump is off
-        shouldTurnPumpOn = False
-
-        # Soil Moisture 1 and  Valve 1
-        if moisture1 <= 3.6 and moisture1 > 2.7:
-            isValve1On = True
-            valve_py.turn_valve_on(1)
-            shouldTurnPumpOn = True
-        else:
-            valve_py.turn_valve_off(1)
-
-        # Valve 2
-        if moisture2 <= 3.6 and moisture2 > 2.7:
-            isValve2On = True
-            valve_py.turn_valve_on(2)
-            shouldTurnPumpOn = True
-        else:
-            valve_py.turn_valve_off(2)
-
-        # Valve 3
-        if moisture3 <= 3.6 and moisture3 > 2.7:
-            isValve3On = True
-            valve_py.turn_valve_on(3)
-            shouldTurnPumpOn = True
-        else:
-            valve_py.turn_valve_off(3)
-        
-        # Turn or off Pump
-        if shouldTurnPumpOn:
-            isPumpOn = True
-            pump_py.turn_on()
-            print("Pump is On")
-        else:
-            pump_py.turn_off()
-            print("Pump is Off")
+            # Valve 3
+            if moisture3 <= 3.6 and moisture3 > 2.7:
+                isValve3On = True
+                valve_py.turn_valve_on(3)
+            else:
+                valve_py.turn_valve_off(3)
+            
+            # Turn or off Pump
+            if isValve1On or isValve2On or isValve3On:
+                isPumpOn = True
+                pump_py.turn_on()
+                print("Pump is On")
+            else:
+                pump_py.turn_off()
+                print("Pump is Off")
+                water_pump_done = True
 
         print("\\\\")
 
@@ -134,10 +136,8 @@ def run_sensors():
         elapsed_time = time.time() - start_time
         print(f"Elapsed Time: {elapsed_time:.2f} seconds")
 
-        if (temp != 0 and humid != 0 and soilMoisture1 != 0 and soilMoisture2 != 0 and soilMoisture3 != 0 and not isAPICalled) or isWindows:
-            # Call API
-            isAPICalled = True
-            return {
+        if round == 0:
+            first_data = {
                 'water_distributed': isPumpOn,
                 'moisture1': moisture1,
                 'moisture2': moisture2,
@@ -146,7 +146,13 @@ def run_sensors():
                 'humidity': humidity,
                 'light': isGrowLightOn
             }
-        time.sleep(0.5)
+        round += 1
+
+        print('\n===================\n')
+        time.sleep(2)
+
+    return first_data
+
         
 
 
