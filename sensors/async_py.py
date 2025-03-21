@@ -104,7 +104,7 @@ def run_sensors(should_get_first_data):
         # ===================================================================
         if not water_pump_done:
             # Soil Moisture 1 and  Valve 1
-            if moisture1 <= 3.85 and moisture1 > 2.7:
+            if moisture1 <= 4 and moisture1 > 2.7:
                 isValve1On = True
                 print('Valve1 On')
                 valve_py.turn_valve_on(1)
@@ -113,7 +113,7 @@ def run_sensors(should_get_first_data):
                 valve_py.turn_valve_off(1)
 
             # Valve 2
-            if moisture2 <= 3.85 and moisture2 > 2.7:
+            if moisture2 <= 4 and moisture2 > 2.7:
                 isValve2On = True
                 print('Valve2 On')
                 valve_py.turn_valve_on(2)
@@ -122,7 +122,7 @@ def run_sensors(should_get_first_data):
                 valve_py.turn_valve_off(2)
 
             # Valve 3
-            if moisture3 <= 3.85 and moisture3 > 2.7:
+            if moisture3 <= 4 and moisture3 > 2.7:
                 isValve3On = True
                 print('Valve3 On')
                 valve_py.turn_valve_on(3)
@@ -134,7 +134,8 @@ def run_sensors(should_get_first_data):
             if isValve1On or isValve2On or isValve3On:
                 isPumpOn = True
                 pump_py.turn_on()
-                print("Pump is On")
+                print("Pump is On for 2 seconds")
+                time.sleep(2)
             else:
                 pump_py.turn_off()
                 print("Pump is Off")
