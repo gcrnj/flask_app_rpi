@@ -1,4 +1,4 @@
-from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py
+from sensors import soil_moisture as moisture_py, valve as valve_py, pump as pump_py, temp_humid as temperature_py, growlight as growlight_py, fan
 import time
 import sys
 import threading
@@ -49,10 +49,13 @@ def run_sensors(should_get_first_data):
             print(f'Temperature {temperature} is just right.')
         
         # HUMIDITY 50 - 80
-        if temperature == None:
+        if humidity == None:
             print('Error in humidity')
         elif humidity > 80:
+            fan.turn_off()
             fan_done = True
+        else:
+            fan.turn_on()
 
 
         # ====================================================================
@@ -101,24 +104,30 @@ def run_sensors(should_get_first_data):
         # ===================================================================
         if not water_pump_done:
             # Soil Moisture 1 and  Valve 1
-            if moisture1 <= 3.6 and moisture1 > 2.7:
+            if moisture1 <= 3.75 and moisture1 > 2.7:
                 isValve1On = True
+                print('Valve1 On')
                 valve_py.turn_valve_on(1)
             else:
+                print('Valve1 Off')
                 valve_py.turn_valve_off(1)
 
             # Valve 2
-            if moisture2 <= 3.6 and moisture2 > 2.7:
+            if moisture2 <= 3.75 and moisture2 > 2.7:
                 isValve2On = True
+                print('Valve2 On')
                 valve_py.turn_valve_on(2)
             else:
+                print('Valve2 Off')
                 valve_py.turn_valve_off(2)
 
             # Valve 3
-            if moisture3 <= 3.6 and moisture3 > 2.7:
+            if moisture3 <= 3.75 and moisture3 > 2.7:
                 isValve3On = True
+                print('Valve3 On')
                 valve_py.turn_valve_on(3)
             else:
+                print('Valve3 Off')
                 valve_py.turn_valve_off(3)
             
             # Turn or off Pump

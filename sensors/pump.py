@@ -48,6 +48,6 @@ if __name__ == '__main__':
     from time import sleep
     while True:
         turn_on()
-        sleep(10)
+        sleep(1)
         turn_off()
         sleep(100)        

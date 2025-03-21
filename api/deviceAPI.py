@@ -57,6 +57,7 @@ def register_device():
             })
         print("added successfully")
 
+        return jsonify({"message": "Device registered successfully", "device_id": 'Zg6XgWqdztP3bDwquu51'}), 201
         return jsonify({"message": "Device registered successfully", "device_id": new_device_ref[1].id}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500

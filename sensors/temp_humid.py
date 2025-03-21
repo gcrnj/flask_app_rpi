@@ -45,9 +45,10 @@ else:
     import board
 
     GPIO.cleanup()
-    DHT_SENSOR = adafruit_dht.DHT11(board.D17)
+    DHT_SENSOR = adafruit_dht.DHT11(board.D23)
 
 def get_temp_humid() -> float | float:
+    return 35,80
     temperature = None
     humidity = None
     while temperature is None or humidity is None:
@@ -55,6 +56,7 @@ def get_temp_humid() -> float | float:
             temperature = DHT_SENSOR.temperature
             humidity = DHT_SENSOR.humidity
             print(f'get_temp_humid = {temperature} / {humidity}')
+            time.sleep(.5)
         except RuntimeError as error:
             print(f"Error: {error}, retrying...")
             time.sleep(1)
