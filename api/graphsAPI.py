@@ -1,5 +1,7 @@
 from flask import Flask, send_file, jsonify
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")  # Fix RuntimeError: main thread is not in main loop
 import matplotlib.pyplot as plt
 from firebase_admin import db, firestore
 from flask import Blueprint, request, jsonify
@@ -99,31 +101,35 @@ def generate_conclusion(df, moistureId: str):
 
 @graphsAPI.route("/get-graph/<device_id>", methods=["GET"])
 def get_graph(device_id):
-    """API endpoint to return graph as Base64 along with a conclusion."""
+    """API endpoint to return multiple graphs and conclusions based on moisture sensors."""
 
-    
-    # Get moistureId from query parameters, defaulting to "moisture1" if not provided
-    moisture_id = request.args.get("moistureId", "moisture1")
+    # Get moistureIds from query parameters, defaulting to ["moisture1"] if not provided
+    moisture_ids = request.args.get("moistureId", "moisture1").split(",")
 
-    print(f'moisture_id = {moisture_id}')
-    # Validate moistureId
-    if moisture_id not in ['moisture1', 'moisture2', 'moisture3']:
-        return jsonify({"error": f"Invalid moistureId: {moisture_id}"}), 400
-    
+    # Validate moistureIds
+    valid_moisture_ids = {"moisture1", "moisture2", "moisture3"}
+    invalid_ids = [m_id for m_id in moisture_ids if m_id not in valid_moisture_ids]
+
+    if invalid_ids:
+        return jsonify({"error": f"Invalid moistureId(s): {', '.join(invalid_ids)}"}), 400
+
     df = fetch_data_from_firebase(device_id)
     if df is None:
         return jsonify({"error": "No data found for this device"}), 404
-    
 
-    
-
-    graph_base64 = generate_graph(df, moisture_id)
-    conclusion = generate_conclusion(df, moisture_id)
-
-    return jsonify({
-        'data': {
-            "device_id": device_id,
+    # Generate results for each moistureId
+    results = []
+    for moisture_id in moisture_ids:
+        graph_base64 = generate_graph(df, moisture_id)
+        conclusion = generate_conclusion(df, moisture_id)
+        
+        results.append({
+            "moisture_id": moisture_id,
             "graph_base64": graph_base64,
             "conclusion": conclusion
-        }
+        })
+
+    return jsonify({
+        "device_id": device_id,
+        "data": results
     })
