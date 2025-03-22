@@ -3,9 +3,6 @@ import time
 import sys
 import threading
 
-validMaxTemperature = 28
-validMinTemperature = 33
-
 def run_sensors(should_get_first_data):
     time.sleep(0.5)
     soilMoisture1 = 0

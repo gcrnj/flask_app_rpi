@@ -50,12 +50,13 @@ def register_device():
     try:
         print("adding device")
         # Reference to the Firestore document
-        new_device_ref = devices_ref.add({
-            "createdAt": firestore.SERVER_TIMESTAMP,
-            "ownerId": [],
-            "deviceName": "Main System"
-            })
-        print("added successfully")
+        
+        # new_device_ref = devices_ref.add({
+        #     "createdAt": firestore.SERVER_TIMESTAMP,
+        #     "ownerId": [],
+        #     "deviceName": "Main System"
+        #     })
+        # print("added successfully")
 
         return jsonify({"message": "Device registered successfully", "device_id": 'Zg6XgWqdztP3bDwquu51'}), 201
         return jsonify({"message": "Device registered successfully", "device_id": new_device_ref[1].id}), 201
