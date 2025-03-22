@@ -124,12 +124,12 @@ def get_graph(device_id):
         conclusion = generate_conclusion(df, moisture_id)
         
         results.append({
+            "device_id": device_id,
             "moisture_id": moisture_id,
             "graph_base64": graph_base64,
             "conclusion": conclusion
         })
 
     return jsonify({
-        "device_id": device_id,
         "data": results
     })
