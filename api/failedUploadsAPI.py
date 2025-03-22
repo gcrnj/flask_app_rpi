@@ -157,7 +157,6 @@ def uploadFailedUploads(device_id):
                 print(f"❌ {response.status_code} Failed to re-upload photo: {upload['file']}")
                 return response.json()
         elif upload['type'] == 'soil_moisture':
-            print(f'eee-{response.text}')
             print('uploading soil_moisture...')
             response = requests.post(f"http://localhost:5000/devices/{device_id}/soil_moisture", json=upload)
             if response.status_code == 201:

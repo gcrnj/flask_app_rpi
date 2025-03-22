@@ -46,7 +46,8 @@ def send_push_notification(device_id, post_data):
     """Fetch tokens dynamically and send push notifications."""
     final_message = generate_notification_message(post_data)
     user_devices: List[UserDevice] = get_device_tokens(device_id)
-    time = post_data['time']
+    time_str = post_data['time']
+    time = datetime.fromisoformat(time_str)
     if not user_devices:
         print("Error: No valid tokens found for the device.")
         return
