@@ -45,7 +45,7 @@ else:
     import board
 
     GPIO.cleanup()
-    DHT_SENSOR = adafruit_dht.DHT21(board.D23)
+    DHT_SENSOR = adafruit_dht.DHT22(board.D23)
 
 def get_temp_humid() -> float | float:
     temperature = None
