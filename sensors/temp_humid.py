@@ -16,19 +16,16 @@ if sys.platform == "win32":
         HIGH = "HIGH"
 
         def setmode(self, mode):
-            a = 1
-            #print(f"Setting GPIO mode: {mode}")
+            print(f"Setting GPIO mode: {mode}")
 
         def cleanup(self):
             cleanup = True
 
         def setup(self, pin, mode):
-            a = 1
-            #print(f"Setting up GPIO pin {pin} as {mode}")
+            print(f"Setting up GPIO pin {pin} as {mode}")
 
         def output(self, pin, value):
-            a = 1
-            #print(f"Setting GPIO pin {pin} to {value}")
+            print(f"Setting GPIO pin {pin} to {value}")
 
     GPIO = FakeGPIO()
 
@@ -38,44 +35,25 @@ if sys.platform == "win32":
         def __init__(self, sensor, pin):
             self.temperature = 25.0  # Dummy temperature value
             self.humidity = 50.0  # Dummy humidity value
-            
-        def read(self):
-            self.temperature = 25.0  # Dummy temperature value
-            self.humidity = 50.0  # Dummy humidity value
-            return self
     adafruit_dht = type("adafruit_dht", (), {"DHT11": None})
     board = type("board", (), {"D5": "D5"})
-    sensor = FakeDHT(adafruit_dht.DHT11, board.D5)
+    DHT_SENSOR = FakeDHT(adafruit_dht.DHT11, board.D5)
     board = FakeBoard()
 else:
     import RPi.GPIO as GPIO
-    GPIO.setmode(GPIO.BCM)
-    import dht11
+    import adafruit_dht
     import board
 
-    if  __name__ == '__main__':
-        import cpio
-    else:
-        from . import cpio
-
-    pin = cpio.Cpio.Temperature.value
-    GPIO.setup(pin, GPIO.IN)
-    sensor = dht11.DHT11(pin = pin)
-
-
+    GPIO.cleanup()
+    DHT_SENSOR = adafruit_dht.DHT22(board.D21)
 
 def get_temp_humid() -> float | float:
-    temperature = 0
-    humidity = 0
-
-    failedRounds = 0
-
-    while temperature == 0 or humidity == 0 or failedRounds == 10:
-        print(f'temperature and humidity is {temperature} and {humidity}')
+    temperature = None
+    humidity = None
+    while temperature is None or humidity is None:
         try:
-            result = sensor.read()
-            temperature = result.temperature
-            humidity = result.humidity
+            temperature = DHT_SENSOR.temperature
+            humidity = DHT_SENSOR.humidity
             print(f'get_temp_humid = {temperature} / {humidity}')
             time.sleep(.5)
         except RuntimeError as error:
@@ -84,8 +62,6 @@ def get_temp_humid() -> float | float:
         except Exception as error:
             print(f"Error: {error}, retrying...")
             time.sleep(1)
-        failedRounds += 1
-        
     return temperature, humidity
 
 
