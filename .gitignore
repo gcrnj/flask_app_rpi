@@ -9,3 +9,4 @@ failed_uploads.json
 uploads/
 static/
 api/__pycache__/__init__.cpython-311.pyc
+captured_image.png
