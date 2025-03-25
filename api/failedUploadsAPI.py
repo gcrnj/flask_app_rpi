@@ -39,7 +39,6 @@ def add_failed_upload(device_id, entry):
         json.dump(data, file, indent=4)
 
 # Assuming these are defined somewhere
-UPLOAD_FOLDER = "uploads"
 PH_TZ = None  # Set your timezone here
 
 failedUploads = Blueprint('failedUploads', __name__)
@@ -61,7 +60,7 @@ def add_failed_upload_endpoint(device_id):
         
         timestamp = datetime.now(PH_TZ).strftime('%Y%m%d-%H%M%S')
         file_extension = file.filename.rsplit('.', 1)[-1].lower()
-        filename = f"{device_id}-{timestamp}.{file_extension}"
+        filename = file.filename
         data = {}
         file_path = ''
         try:

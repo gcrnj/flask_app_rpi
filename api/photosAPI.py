@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, send_file
 from firebase_admin import firestore, storage
 from datetime import datetime, timezone, timedelta
+import requests
+import os
 
 db = firestore.client()
 devices_ref = db.collection('devices')
@@ -93,12 +95,60 @@ def list_files(device_id):
         print(f"❌ Error: {str(e)}")  # Debugging log
         return jsonify({"error": str(e)}), 500
 
-@photosAPI.route("/capture", methods=["GET"])
-def capture_photo():
+
+@photosAPI.route("/<device_id>/capture", methods=["GET"])
+def capture_photo(device_id):
+    failed_upload_url = f"http://localhost:5000/failed-uploads/{device_id}/failed_upload"
     from sensors import camera
-    captured_path = camera.capture_image()
+    now = datetime.now(PH_TZ)
+    date_str = now.strftime("%Y-%m-%d")  # e.g., 2025-03-09
+    time_str = now.strftime("%H-%M-%S")  # e.g., 14-30 (24-hour format)
+
+    # Define the storage path
+    blob_path = f"captured_photos/{device_id}/{date_str}/{time_str}.jpg"
+
+    # Capture the image (Retry once if necessary)
+    captured_path = camera.capture_image(device_id)
+    if captured_path is None:
+        print("captured_path is None")
+        captured_path = camera.capture_image(device_id)
     
     if captured_path is None:
         return jsonify({'error': 'Cannot capture camera'}), 500
     
-    return send_file(captured_path, mimetype='image/png')
+    print(f'captured_path = {captured_path}')
+    # Generate metadata (Replace with actual AI results)
+    metadata = {
+        "device_id": device_id,
+        "health_status": "Healthy",
+        "growth_stage": "Vegetative",
+        "timestamp": now.isoformat()
+    }
+
+    try:
+        # Upload image to Firebase Storage
+        bucket = storage.bucket()
+        blob = bucket.blob(blob_path)
+        blob.metadata = metadata
+
+        captured_path = os.path.abspath(captured_path)  # Ensure absolute path
+        with open(captured_path, "rb") as image_file:
+            blob.upload_from_file(image_file, content_type="image/jpeg")  # Specify content type
+
+        #blob.make_public()  # Make the URL accessible
+
+        # Get Firebase URL
+        image_url = blob.public_url
+
+        return jsonify({
+            "image_url": image_url,
+            "metadata": metadata
+        })
+
+    except Exception as e:
+        print(f"Upload failed: {e}")
+
+        with open(captured_path, "rb") as image_file:
+            failed_upload_response = requests.post(failed_upload_url, files={'file': image_file}, data={'type': 'photo'})
+            print(f'failed_upload_response = {failed_upload_response.text}')
+        return jsonify({"error": "Failed to upload image to Firebase"}), 500

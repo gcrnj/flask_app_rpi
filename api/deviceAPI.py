@@ -227,11 +227,11 @@ def add_temperature(device_id):
             "water_distributed": water_distributed
         }
         new_doc_ref = readings_ref.add(post_data)
+        post_data['time'] = date_time.isoformat()
         added_post_data = post_data
 
         # Check if the document was added successfully
         post_data['type'] = 'soil_moisture'
-        post_data['time'] = date_time.isoformat()
         if new_doc_ref:
             print('Doc Added successfully')
             doc_id = ''
