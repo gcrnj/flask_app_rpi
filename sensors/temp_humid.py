@@ -16,16 +16,19 @@ if sys.platform == "win32":
         HIGH = "HIGH"
 
         def setmode(self, mode):
-            print(f"Setting GPIO mode: {mode}")
+            a = 1
+            #print(f"Setting GPIO mode: {mode}")
 
         def cleanup(self):
             cleanup = True
 
         def setup(self, pin, mode):
-            print(f"Setting up GPIO pin {pin} as {mode}")
+            a = 1
+            #print(f"Setting up GPIO pin {pin} as {mode}")
 
         def output(self, pin, value):
-            print(f"Setting GPIO pin {pin} to {value}")
+            a = 1
+            #print(f"Setting GPIO pin {pin} to {value}")
 
     GPIO = FakeGPIO()
 
@@ -37,23 +40,37 @@ if sys.platform == "win32":
             self.humidity = 50.0  # Dummy humidity value
     adafruit_dht = type("adafruit_dht", (), {"DHT11": None})
     board = type("board", (), {"D5": "D5"})
-    DHT_SENSOR = FakeDHT(adafruit_dht.DHT11, board.D5)
+    sensor = FakeDHT(adafruit_dht.DHT11, board.D5)
     board = FakeBoard()
 else:
     import RPi.GPIO as GPIO
-    import adafruit_dht
+    GPIO.setmode(GPIO.BCM)
+    import dht11
     import board
 
-    GPIO.cleanup()
-    DHT_SENSOR = adafruit_dht.DHT22(board.D23)
+    if  __name__ == '__main__':
+        import cpio
+    else:
+        from . import cpio
+
+    pin = cpio.Cpio.Temperature.value
+    sensor = dht11.DHT11(pin = pin)
+
+
 
 def get_temp_humid() -> float | float:
-    temperature = None
-    humidity = None
-    while temperature is None or humidity is None:
+    temperature = 0
+    humidity = 0
+
+    failedRounds = 0
+
+    while temperature == 0 or humidity == 0:
+        failedRounds += 1
+        print(f'temperature and humidity is {temperature} and {humidity}')
         try:
-            temperature = DHT_SENSOR.temperature
-            humidity = DHT_SENSOR.humidity
+            result = sensor.read()
+            temperature = result.temperature
+            humidity = result.humidity
             print(f'get_temp_humid = {temperature} / {humidity}')
             time.sleep(.5)
         except RuntimeError as error:
@@ -62,6 +79,8 @@ def get_temp_humid() -> float | float:
         except Exception as error:
             print(f"Error: {error}, retrying...")
             time.sleep(1)
+        if failedRounds == 10 and (temperature == 0 or humidity == 0):
+            return 0, 0
     return temperature, humidity
 
 
