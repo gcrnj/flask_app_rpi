@@ -7,6 +7,7 @@ from flask import request
 import requests
 from sensors import async_py
 import threading
+import argparse
 
 db = firestore.client()
 devices_ref = db.collection('devices')
@@ -28,7 +29,13 @@ def start():
 
 print(f'__name__ = {__name__}')
 if __name__ == 'api.deviceAPI':
-    start()
+    parser = argparse.ArgumentParser(description="Run main.py with an async flag")
+    parser.add_argument("--run-async", action="store_true", help="Enable async execution")
+
+    args = parser.parse_args()
+    print(f'run-async = {args.run_async}')
+    if args.run_async:
+        start()
 
 
 # All Devices
@@ -167,9 +174,15 @@ def add_temperature(device_id):
     try:
         # Get request data
         try:
+            global initial_data
+            if not initial_data:
+                print('Not initial data')
+                initial_data = async_py.run_sensors(should_get_first_data=True)
+            print(f' initial data {initial_data}')
+
             data = initial_data
         except Exception as e:
-            return jsonify({"error": f"Error in asunc_py {e}"}), 400
+            return jsonify({"error": f"Error in async_py {e}"}), 400
 
         
         # time = data.get("time")
