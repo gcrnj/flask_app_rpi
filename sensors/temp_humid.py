@@ -38,6 +38,11 @@ if sys.platform == "win32":
         def __init__(self, sensor, pin):
             self.temperature = 25.0  # Dummy temperature value
             self.humidity = 50.0  # Dummy humidity value
+            
+        def read(self):
+            self.temperature = 25.0  # Dummy temperature value
+            self.humidity = 50.0  # Dummy humidity value
+            return self
     adafruit_dht = type("adafruit_dht", (), {"DHT11": None})
     board = type("board", (), {"D5": "D5"})
     sensor = FakeDHT(adafruit_dht.DHT11, board.D5)

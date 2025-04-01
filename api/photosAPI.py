@@ -61,7 +61,7 @@ def upload_file(device_id):
 
 @photosAPI.route("/<device_id>/list-files", methods=["GET"])
 def list_files(device_id):
-    """List all uploaded files for a device grouped by date."""
+    """List all uploaded files for a device grouped by date with custom metadata."""
     try:
         prefix = f"captured_photos/{device_id}/"  # Only fetch files inside this folder
         blobs = bucket.list_blobs(prefix=prefix)
@@ -79,12 +79,33 @@ def list_files(device_id):
             file_name = path_parts[3] if len(path_parts) > 3 else None  # HH-MM.jpg
 
             if file_name:
-                file_url = blob.public_url  # Get public URL of the file
+                # Fetch metadata for the blob
+                blob.reload()  # Refresh metadata
+
+                # Get file metadata
+                file_size = f"{blob.size / (1024 * 1024):.2f} MB" if blob.size else "0 MB"
+                content_type = blob.content_type or "unknown"
+                creation_time = blob.time_created.isoformat() if blob.time_created else "unknown"
+                last_updated = blob.updated.isoformat() if blob.updated else "unknown"
+                download_url = blob.generate_signed_url(expiration=3600)  # 1-hour signed URL
+
+                # Get custom metadata
+                custom_metadata = blob.metadata or {}  # Dictionary of custom metadata
+
+                # Initialize date group if not exists
                 if date_folder not in files_by_date:
                     files_by_date[date_folder] = []
+
+                # Append file metadata to the list
                 files_by_date[date_folder].append({
                     "file_name": file_name,
-                    "file_url": file_url
+                    "file_url": blob.public_url,
+                    "file_size": file_size,
+                    "content_type": content_type,
+                    "creation_time": creation_time,
+                    "last_updated": last_updated,
+                    "download_url": download_url,
+                    "custom_metadata": custom_metadata  # Include custom metadata
                 })
 
         return jsonify({
@@ -129,12 +150,18 @@ def capture_photo(device_id):
         # Upload image to Firebase Storage
         bucket = storage.bucket()
         blob = bucket.blob(blob_path)
-        blob.metadata = metadata
 
         captured_path = os.path.abspath(captured_path)  # Ensure absolute path
         with open(captured_path, "rb") as image_file:
             blob.upload_from_file(image_file, content_type="image/jpeg")  # Specify content type
+        
+        # Set metadata after upload
+        blob.metadata = metadata
+        blob.patch()  # Apply metadata
 
+        # Make sure it's publicly accessible
+        blob.make_public()
+        
         #blob.make_public()  # Make the URL accessible
 
         # Get Firebase URL
@@ -151,4 +178,4 @@ def capture_photo(device_id):
         with open(captured_path, "rb") as image_file:
             failed_upload_response = requests.post(failed_upload_url, files={'file': image_file}, data={'type': 'photo'})
             print(f'failed_upload_response = {failed_upload_response.text}')
-        return jsonify({"error": "Failed to upload image to Firebase"}), 500
+        return jsonify({"error": f"Failed to upload image to Firebase - {e}"}), 500
