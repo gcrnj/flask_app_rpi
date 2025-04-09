@@ -70,13 +70,12 @@ def get_temp_humid() -> float | float:
 
     failedRounds = 0
 
-    while temperature == 0 or humidity == 0 or failedRounds == 10:
+    while (temperature == 0 or humidity == 0) and failedRounds == 10:
         print(f'temperature and humidity is {temperature} and {humidity}')
         try:
             result = sensor.read()
             temperature = result.temperature
             humidity = result.humidity
-            print(f'get_temp_humid = {temperature} / {humidity}')
             time.sleep(.5)
         except RuntimeError as error:
             print(f"Error: {error}, retrying...")
@@ -85,7 +84,9 @@ def get_temp_humid() -> float | float:
             print(f"Error: {error}, retrying...")
             time.sleep(1)
         failedRounds += 1
-        
+    
+    print(f'get_temp_humid = {temperature} / {humidity}')
+    print(f'retries = {failedRounds}')
     return temperature, humidity
 
 
