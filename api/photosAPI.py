@@ -4,6 +4,10 @@ from datetime import datetime, timezone, timedelta
 import requests
 import os
 
+if __name__ == '__main__':
+    from ai import get_growth_stage
+else:
+    from api.ai import get_growth_stage
 db = firestore.client()
 devices_ref = db.collection('devices')
 bucket = storage.bucket()  # Use actual bucket name
@@ -139,6 +143,8 @@ def capture_photo(device_id):
     
     print(f'captured_path = {captured_path}')
     # Generate metadata (Replace with actual AI results)
+    growth_stage = get_growth_stage(captured_path)
+
     metadata = {
         "device_id": device_id,
         "health_status": "Healthy",
