@@ -59,6 +59,7 @@ else:
         from . import cpio
 
     pin = cpio.Cpio.Temperature.value
+    GPIO.setup(pin, GPIO.OUT)
     sensor = dht11.DHT11(pin = pin)
 
 
