@@ -45,6 +45,7 @@ else:
     import board
 
     GPIO.cleanup()
+    GPIO.setup(21, GPIO.OUT)  # Set valve pins as output
     DHT_SENSOR = adafruit_dht.DHT22(board.D21)
 
 def get_temp_humid() -> float | float:
@@ -62,6 +63,8 @@ def get_temp_humid() -> float | float:
         except Exception as error:
             print(f"Error: {error}, retrying...")
             time.sleep(1)
+    
+    print(f'get_temp_humid = {temperature} / {humidity}')
     return temperature, humidity
 
 

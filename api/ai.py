@@ -8,7 +8,7 @@ from tensorflow.keras.models import load_model
 if sys.platform == "win32":
     keras_path = 'D:\\PythonProjects\\flask_app_rpi\\api\\corn_classification_model_v2.keras'
 else:
-    keras_path = ''  # Adjust path for other OS if necessary
+    keras_path = '/home/techtitansPass1234/techtitans_project/flask_app_rpi/api/corn_classification_model_v2.keras'  # Adjust path for other OS if necessary
 
 # Load the model
 model = models.load_model(keras_path)
