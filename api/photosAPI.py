@@ -147,7 +147,7 @@ def capture_photo(device_id):
 
     metadata = {
         "device_id": device_id,
-        "health_status": "Healthy",
+        "health_status": growth_stage,
         "growth_stage": "Vegetative",
         "timestamp": now.isoformat()
     }
