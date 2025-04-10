@@ -120,68 +120,73 @@ def list_files(device_id):
         print(f"❌ Error: {str(e)}")  # Debugging log
         return jsonify({"error": str(e)}), 500
 
-
 @photosAPI.route("/<device_id>/capture", methods=["GET"])
 def capture_photo(device_id):
-    failed_upload_url = f"http://localhost:5000/failed-uploads/{device_id}/failed_upload"
     from sensors import camera
     now = datetime.now(PH_TZ)
     date_str = now.strftime("%Y-%m-%d")  # e.g., 2025-03-09
     time_str = now.strftime("%H-%M-%S")  # e.g., 14-30 (24-hour format)
 
-    # Define the storage path
-    blob_path = f"captured_photos/{device_id}/{date_str}/{time_str}.jpg"
+    # Firebase Storage base path
+    base_blob_path = f"captured_photos/{device_id}/{date_str}/{time_str}"
 
-    # Capture the image (Retry once if necessary)
-    captured_path = camera.capture_image(device_id)
-    if captured_path is None:
-        print("captured_path is None")
-        captured_path = camera.capture_image(device_id)
-    
-    if captured_path is None:
+    # Capture the image and get AI results
+    healths, stages, captured_paths, port_numbers = camera.get_ai_results(device_id)
+
+    if not any(captured_paths):  # all are None
         return jsonify({'error': 'Cannot capture camera'}), 500
-    
-    print(f'captured_path = {captured_path}')
-    # Generate metadata (Replace with actual AI results)
-    growth_stage = get_growth_stage(captured_path)
 
-    metadata = {
-        "device_id": device_id,
-        "health_status": growth_stage,
-        "growth_stage": "Vegetative",
-        "timestamp": now.isoformat()
-    }
+    results = []
+    failed_upload_url = f"http://localhost:5000/failed-uploads/{device_id}/failed_upload"
 
-    try:
-        # Upload image to Firebase Storage
-        bucket = storage.bucket()
-        blob = bucket.blob(blob_path)
+    for i, captured_path in enumerate(captured_paths):
+        if captured_path is None:
+            continue
 
-        captured_path = os.path.abspath(captured_path)  # Ensure absolute path
-        with open(captured_path, "rb") as image_file:
-            blob.upload_from_file(image_file, content_type="image/jpeg")  # Specify content type
-        
-        # Set metadata after upload
-        blob.metadata = metadata
-        blob.patch()  # Apply metadata
+        try:
+            captured_path = os.path.abspath(captured_path)  # Ensure absolute path
+            blob_path = f"{base_blob_path}/camera_{i}.jpg"
 
-        # Make sure it's publicly accessible
-        blob.make_public()
-        
-        #blob.make_public()  # Make the URL accessible
+            # Generate metadata
+            metadata = {
+                "device_id": device_id,
+                "health_status": healths[i],
+                "growth_stage": stages[i],
+                "timestamp": now.isoformat(),
+                "camera": port_numbers[i]
+            }
 
-        # Get Firebase URL
-        image_url = blob.public_url
+            # Upload to Firebase
+            bucket = storage.bucket()
+            blob = bucket.blob(blob_path)
 
-        return jsonify({
-            "image_url": image_url,
-            "metadata": metadata
-        })
+            with open(captured_path, "rb") as image_file:
+                blob.upload_from_file(image_file, content_type="image/jpeg")
 
-    except Exception as e:
-        print(f"Upload failed: {e}")
+            # Set metadata
+            blob.metadata = metadata
+            blob.patch()
 
-        with open(captured_path, "rb") as image_file:
-            failed_upload_response = requests.post(failed_upload_url, files={'file': image_file}, data={'type': 'photo'})
-            print(f'failed_upload_response = {failed_upload_response.text}')
-        return jsonify({"error": f"Failed to upload image to Firebase - {e}"}), 500
+            # Make the image public and get URL
+            blob.make_public()
+            image_url = blob.public_url
+
+            results.append({
+                "image_url": image_url,
+                "metadata": metadata
+            })
+
+        except Exception as e:
+            print(f"Upload failed for camera_{i}: {e}")
+            try:
+                with open(captured_path, "rb") as image_file:
+                    failed_upload_response = requests.post(
+                        failed_upload_url,
+                        files={'file': image_file},
+                        data={'type': 'photo'}
+                    )
+                    print(f'failed_upload_response = {failed_upload_response.text}')
+            except Exception as inner_e:
+                print(f"Failed to send to failed upload endpoint: {inner_e}")
+
+    return jsonify(results if results else {"error": "All uploads failed"}), 200 if results else 500
