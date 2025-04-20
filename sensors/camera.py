@@ -12,7 +12,7 @@ PH_TZ = timezone(timedelta(hours=8))
 def get_file_name(camera, device_id):
     # Save the image
     timestamp = datetime.now(PH_TZ).strftime('%Y%m%d-%H%M%S')
-    file_name = f"api/static/{device_id}-{timestamp}-{camera}.jpg"
+    file_name = f"../api/static/{device_id}-{timestamp}-{camera}.jpg"
     return file_name
 
 def get_image(web_cam, device_id):

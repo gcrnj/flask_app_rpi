@@ -7,7 +7,7 @@ import requests
 failedUploads = Blueprint('failedUploads', __name__)
 PH_TZ = timezone(timedelta(hours=8))
 FAILED_UPLOADS_FILE = 'failed_uploads.json'
-UPLOAD_FOLDER = 'api\\static'  # Folder to store failed photos
+UPLOAD_FOLDER = '..\\api\\static'  # Folder to store failed photos
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
