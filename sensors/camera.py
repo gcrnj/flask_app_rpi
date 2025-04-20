@@ -43,6 +43,7 @@ def get_image(web_cam, device_id):
     
 def get_ai_results(device_id):
     cameras = [0, 2, 4]
+    ports = [0, 1, 2]
     healths = []
     stages = []
     paths = []
@@ -54,7 +55,7 @@ def get_ai_results(device_id):
         stages.append(stage)
         paths.append(image_path)
         time.sleep(0.5)
-    return healths, stages, paths, cameras
+    return healths, stages, paths, ports
 if __name__ == '__main__':
     device_id = 'Zg6XgWqdztP3bDwquu51'
     healths, stages, paths, cameras = get_ai_results(device_id)
