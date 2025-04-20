@@ -4,14 +4,15 @@ import cv2
 from inference_sdk import InferenceHTTPClient
 
 ROBOFLOW_API_KEY = "mUHiIlSJOzpUNaF5KXib"
-ROBOFLOW_MODEL_ID = "capstone-maize-growth/2"
+ROBOFLOW_MODEL_ID = "capstone-maize-growth-v2/2"
 
 stage_mapping = {
-    "Stage 1": "V3",
-    "Stage 2": "V6",
-    "Stage 3": "V9",
-    "Stage 4": "V10",
-    "Stage 5": "R1"
+    "Maize Growth Stage 1": "V3",
+    "Maize Growth Stage 2": "V6",
+    "Maize Growth Stage 3": "V9",
+    "Maize Growth Stage 4": "V10",
+    "Maize Growth Stage 5": "R1",
+    "Unhealthy Leaf": "Unlabeled"
 }
 
 def get_stage(ret, frame, image_path):
@@ -22,7 +23,7 @@ def get_stage(ret, frame, image_path):
     print("[INFO] Sending to Roboflow for growth stage inference...")
     try:
         client = InferenceHTTPClient(
-            api_url="https://detect.roboflow.com",
+            api_url="https://serverless.roboflow.com",
             api_key=ROBOFLOW_API_KEY
         )
         result = client.infer(image_path, model_id=ROBOFLOW_MODEL_ID)

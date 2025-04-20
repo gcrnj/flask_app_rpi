@@ -12,7 +12,7 @@ ROBOFLOW_SIZE = 416
 upload_url = f"https://detect.roboflow.com/{ROBOFLOW_MODEL_ID}?api_key={ROBOFLOW_API_KEY}&format=json"
 
 def get_health(ret, full_res_frame):
-    print("[INFO] Capturing image from webcam...")
+
     if not ret:
         print("[ERROR] Failed to capture image.")
         return None
@@ -83,11 +83,3 @@ def get_health(ret, full_res_frame):
     cv2.destroyAllWindows()
 
     return classification
-
-
-if __name__ == '__main__':
-    import camera
-    ret, frame, image_path = camera.get_image(0, 'Zg6XgWqdztP3bDwquu51')
-    print(image_path)
-    health = get_health(ret, frame)
-    print(health)

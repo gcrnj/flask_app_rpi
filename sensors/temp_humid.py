@@ -29,12 +29,17 @@ if sys.platform == "win32":
 
     GPIO = FakeGPIO()
 
+    import random
     class FakeDHT:
-        temperature = 25
-        humidity = 25
+        @property
+        def temperature(self):
+            return round(random.uniform(20.0, 30.0), 2)  # 2 decimal places
+
+        @property
+        def humidity(self):
+            return round(random.uniform(45, 90), 2)  # 2 decimal places
         def __init__(self, sensor, pin):
-            self.temperature = 25.0  # Dummy temperature value
-            self.humidity = 50.0  # Dummy humidity value
+            print('')
     adafruit_dht = type("adafruit_dht", (), {"DHT11": None})
     board = type("board", (), {"D5": "D5"})
     DHT_SENSOR = FakeDHT(adafruit_dht.DHT11, board.D5)

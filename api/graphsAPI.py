@@ -5,18 +5,22 @@ matplotlib.use("Agg")  # Fix RuntimeError: main thread is not in main loop
 import matplotlib.pyplot as plt
 from firebase_admin import db, firestore
 from flask import Blueprint, request, jsonify
-from datetime import timezone, timedelta
+from datetime import timezone, timedelta, datetime
 import base64
 import io
+import numpy as np
 
 db = firestore.client()
 
 graphsAPI = Blueprint('graphs', __name__)
 PH_TZ = timezone(timedelta(hours=8))
 
-def fetch_data_from_firebase(device_id):
+def fetch_data_from_firebase(device_id, start_date, end_date):
     """Fetch moisture readings from Firebase for a given device ID."""
-    ref = db.collection(f"devices/{device_id}/moisture_readings")
+    ref = db.collection('devices').document(device_id).collection('moisture_readings')
+    ref = ref.where("time", ">=", start_date)
+    ref = ref.where("time", "<=", end_date)
+
     docs = ref.stream()
 
     data = []
@@ -42,6 +46,8 @@ def generate_graph(df, moisture_id):
     plt.title("Soil Moisture, Temperature & Humidity Trends")
     plt.legend()
     plt.grid(True)
+
+    plt.yticks(np.arange(0, 55, 5))
 
     # Save the image to a BytesIO stream
     img_buffer = io.BytesIO()
@@ -103,6 +109,11 @@ def generate_conclusion(df, moistureId: str):
 def get_graph(device_id):
     """API endpoint to return multiple graphs and conclusions based on moisture sensors."""
 
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    start = datetime.fromisoformat(start_date).replace(tzinfo=PH_TZ)
+    end = datetime.fromisoformat(end_date).replace(tzinfo=PH_TZ)
+
     # Get moistureIds from query parameters, defaulting to ["moisture1"] if not provided
     moisture_ids = request.args.get("moistureId", "moisture1").split(",")
 
@@ -113,13 +124,15 @@ def get_graph(device_id):
     if invalid_ids:
         return jsonify({"error": f"Invalid moistureId(s): {', '.join(invalid_ids)}"}), 400
 
-    df = fetch_data_from_firebase(device_id)
+    df = fetch_data_from_firebase(device_id, start, end)
     if df is None:
         return jsonify({"error": "No data found for this device"}), 404
 
     # Generate results for each moistureId
     results = []
     for moisture_id in moisture_ids:
+        print(f'df {df}')
+        print(f'moisture_id {moisture_id}')
         graph_base64 = generate_graph(df, moisture_id)
         conclusion = generate_conclusion(df, moisture_id)
         

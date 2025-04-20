@@ -128,9 +128,11 @@ def capture_photo(device_id):
     time_str = now.strftime("%H-%M-%S")  # e.g., 14-30 (24-hour format)
 
     # Firebase Storage base path
-    base_blob_path = f"captured_photos/{device_id}/{date_str}/{time_str}"
+    base_blob_path = f"captured_photos/{device_id}/{date_str}"
 
     # Capture the image and get AI results
+    
+    # Save the image
     healths, stages, captured_paths, port_numbers = camera.get_ai_results(device_id)
 
     if not any(captured_paths):  # all are None
@@ -145,7 +147,7 @@ def capture_photo(device_id):
 
         try:
             captured_path = os.path.abspath(captured_path)  # Ensure absolute path
-            blob_path = f"{base_blob_path}/camera_{i}.jpg"
+            blob_path = f"{base_blob_path}/{time_str}-{i}.jpg"
 
             # Generate metadata
             metadata = {
