@@ -22,7 +22,7 @@ def get_image(web_cam, device_id):
     Returns:
     ret, frame, image_path
     """
-    video = cv2.VideoCapture(web_cam)
+    video = cv2.VideoCapture(f'/dev/video{web_cam}')
     video.set(cv2.CAP_PROP_FRAME_WIDTH, 1080)
     video.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
