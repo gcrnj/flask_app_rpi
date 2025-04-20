@@ -1,5 +1,7 @@
 import sys
 import time
+
+# Check platform (Windows = use dummy; Raspberry Pi = real sensor)
 if sys.platform == "win32":
     print("Running on Windows - Using dummy GPIO")
 
@@ -19,7 +21,7 @@ if sys.platform == "win32":
             print(f"Setting GPIO mode: {mode}")
 
         def cleanup(self):
-            cleanup = True
+            print("Cleaning up GPIO")
 
         def setup(self, pin, mode):
             print(f"Setting up GPIO pin {pin} as {mode}")
@@ -41,37 +43,43 @@ if sys.platform == "win32":
         def __init__(self, sensor, pin):
             print('')
     adafruit_dht = type("adafruit_dht", (), {"DHT11": None})
-    board = type("board", (), {"D5": "D5"})
-    DHT_SENSOR = FakeDHT(adafruit_dht.DHT11, board.D5)
+    board = type("board", (), {"D17": "D17"})  # Dummy pin for Windows
+    DHT_SENSOR = FakeDHT(adafruit_dht.DHT11, board.D17)
     board = FakeBoard()
+
 else:
+    # On Raspberry Pi - use real GPIO and DHT11 sensor
     import RPi.GPIO as GPIO
     import adafruit_dht
     import board
 
+    GPIO.setmode(GPIO.BCM)
     GPIO.cleanup()
-    GPIO.setup(21, GPIO.OUT)  # Set valve pins as output
-    DHT_SENSOR = adafruit_dht.DHT22(board.D21)
+    GPIO.setup(20, GPIO.OUT)  # Optional: control valve or other component
 
-def get_temp_humid() -> float | float:
+    # Update this to the correct GPIO pin: GPIO17 = pin 11
+    DHT_SENSOR = adafruit_dht.DHT11(board.D17)
+
+
+def get_temp_humid() -> tuple[float | None, float | None]:
     temperature = None
     humidity = None
-    while temperature is None or humidity is None:
+    retries = 0
+    while (temperature is None or humidity is None) and retries < 10:
         try:
             temperature = DHT_SENSOR.temperature
             humidity = DHT_SENSOR.humidity
-            print(f'get_temp_humid = {temperature} / {humidity}')
-            time.sleep(.5)
+            print(f"Attempt {retries+1}: Temp={temperature}, Humidity={humidity}")
         except RuntimeError as error:
-            print(f"Error: {error}, retrying...")
-            time.sleep(1)
+            print(f"RuntimeError: {error}, retrying...")
         except Exception as error:
-            print(f"Error: {error}, retrying...")
-            time.sleep(1)
-    
-    print(f'get_temp_humid = {temperature} / {humidity}')
+            print(f"Other error: {error}, retrying...")
+        time.sleep(1)
+        retries += 1
+
+    print(f'Final reading: Temp = {temperature}°C, Humidity = {humidity}%')
     return temperature, humidity
 
 
 if __name__ == '__main__':
-    print(get_temp_humid())
+    get_temp_humid()
