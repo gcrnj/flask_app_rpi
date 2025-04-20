@@ -1,18 +1,21 @@
 import cv2
 from datetime import datetime, timezone, timedelta
 import sys
+import os
 import time
 if __name__ == '__main__':
     import corn_disease, corn_growth
 else:
     from sensors import corn_disease, corn_growth
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Open the webcam (0 is the default camera)
 PH_TZ = timezone(timedelta(hours=8))
 
 def get_file_name(camera, device_id):
     # Save the image
     timestamp = datetime.now(PH_TZ).strftime('%Y%m%d-%H%M%S')
-    file_name = f"../api/static/{device_id}-{timestamp}-{camera}.jpg"
+    file_name = f"api/static/{device_id}-{timestamp}-{camera}.jpg"
     return file_name
 
 def get_image(web_cam, device_id):
@@ -38,7 +41,7 @@ def get_image(web_cam, device_id):
         return None, None, None
 
     image_path = get_file_name(web_cam, device_id)
-    cv2.imwrite(image_path, frame)
+    cv2.imwrite(os.path.join(BASE_DIR, image_path), frame)
     return ret, frame, image_path
     
 def get_ai_results(device_id):
