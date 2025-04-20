@@ -42,7 +42,7 @@ def get_image(web_cam, device_id):
     return ret, frame, image_path
     
 def get_ai_results(device_id):
-    cameras = [0, 2, 5]
+    cameras = [0, 2, 6]
     healths = []
     stages = []
     paths = []
