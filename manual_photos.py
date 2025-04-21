@@ -62,7 +62,9 @@ def main():
             blob.upload_from_filename(local_path, content_type="image/jpeg")
             blob.metadata = metadata
             blob.patch()
-            print(f"[UPLOADED] {firebase_path}")
+            blob.make_public()
+            image_url = blob.public_url
+            print(f"[UPLOADED] {firebase_path} - {image_url}")
         except Exception as e:
             print(f"[ERROR] Failed to upload {local_path}: {e}")
 

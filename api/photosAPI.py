@@ -135,9 +135,6 @@ def capture_photo(device_id):
     # Save the image
     healths, stages, captured_paths, port_numbers = camera.get_ai_results(device_id)
 
-    if not any(captured_paths):  # all are None
-        return jsonify({'error': 'Cannot capture camera'}), 500
-
     results = []
     failed_upload_url = f"http://localhost:5000/failed-uploads/{device_id}/failed_upload"
 
