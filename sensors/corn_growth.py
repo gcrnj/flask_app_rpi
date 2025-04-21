@@ -69,7 +69,7 @@ def get_stage(ret, frame, image_path):
 
     print(f"[INFO] {summary_text}")
     print("[INFO] Displaying result...")
-    cv2.imshow("Maize Growth Stage Detection", frame)
+    # cv2.imshow("Maize Growth Stage Detection", frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 

@@ -8,7 +8,6 @@ if __name__ == '__main__':
 else:
     from sensors import corn_disease, corn_growth
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Open the webcam (0 is the default camera)
 PH_TZ = timezone(timedelta(hours=8))
 
@@ -25,7 +24,10 @@ def get_image(web_cam, device_id):
     Returns:
     ret, frame, image_path
     """
-    video = cv2.VideoCapture(f'/dev/video{web_cam}')
+    if os.name == 'nt':
+        video = cv2.VideoCapture(web_cam)
+    else:
+        video = cv2.VideoCapture(f'/dev/video{web_cam}')
     video.set(cv2.CAP_PROP_FRAME_WIDTH, 1080)
     video.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
@@ -41,12 +43,12 @@ def get_image(web_cam, device_id):
         return None, None, None
 
     image_path = get_file_name(web_cam, device_id)
-    cv2.imwrite(os.path.join(BASE_DIR, image_path), frame)
+    cv2.imwrite(image_path, frame)
     return ret, frame, image_path
     
 def get_ai_results(device_id):
-    cameras = [0, 2, 4]
-    ports = [0, 1, 2]
+    cameras = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ports = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     healths = []
     stages = []
     paths = []
